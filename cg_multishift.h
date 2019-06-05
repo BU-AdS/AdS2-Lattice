@@ -79,7 +79,7 @@ Float diffnorm2sq(Float* v1, Float* v2, const int size)
 void Minv_phi_ms(Float **phi, Float *phi0, vector<Vertex> NodeList, Param p){
 
   int n_shift = p.n_shift;
-  int size = (endNode(p.Levels,p) + 1) * p.t;
+  int size = (endNode(p.Levels,p) + 1);
   int resid_freq_check = 10;
   int max_iter = p.MaxIter;
   Float eps = p.tol;

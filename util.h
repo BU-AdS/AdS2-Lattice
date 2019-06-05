@@ -22,10 +22,9 @@ class Param{
   int MaxIter = 100000;
   int n_shift = 100;
   Float tol = pow(10,-6);
-  int t = 1;
   Float msqr = 1.0;
   Float lambda = 0.0;
-  Float C_msqr = 4.0;
+  Float C_msqr = 2.0;
   Float N_latt = 1.0;
   int Levels = 6;
   int src_pos = -1;
@@ -36,8 +35,8 @@ class Param{
   int SurfaceVol = 0;
   int AdSVol = 0;
   int latVol = 0;
-  // double lambda = 1.0;
-  //double musqr = 1.0;
+  //double lambda = 1.0;
+  double musqr = 1.0;
   int *cluster ;    // Swendsen Wang Data Struture
   int *stack ;     // Wolf Data Struture
   int NumClusters ;
@@ -66,7 +65,6 @@ class Param{
     cout<<"MaxIter = "<<MaxIter<<endl;
     cout<<"Number of Shifts = "<<n_shift<<endl;
     cout<<"Tol = "<<tol<<endl;
-    cout<<"TimeSlices = "<<t<<endl;   
     cout<<"Mass squared = "<<msqr<<endl;
     cout<<"lambda = "<<lambda<<endl;
     cout<<"Levels = "<<Levels<<endl;
@@ -78,7 +76,6 @@ class Param{
   
   void init(int argc, char **argv) 
   { 
-    cout<<"FLAG"<<endl;
     std::string BC(argv[1]);
     if (BC == "D" || BC == "d") 
 	bc = true;
@@ -89,7 +86,7 @@ class Param{
 	cout<<"Invalid boundary condition given. Use D/d for Dirichlet or N/n for Neumann."<<endl;
 	exit(0);
       }
-    cout<<"FLAG"<<endl;
+
     std::string Centre(argv[2]);
     if (Centre == "V" || Centre == "v") 
       Vcentre = true;
@@ -100,7 +97,7 @@ class Param{
 	cout<<"Invalid centre condition given. Use V/v for Vertexcentred or C/c for Circumcentred."<<endl;
 	exit(0);
       }
-    cout<<"FLAG"<<endl;
+
     std::string verbose(argv[3]);
     if (verbose == "V" || verbose == "v") 
 	verbosity = true;
@@ -111,33 +108,28 @@ class Param{
 	cout<<"Invalid Verbosity conditions given. Use verbose/quiet"<<endl;
 	exit(0);
       }
-    cout<<"FLAG"<<endl;
+
     MaxIter = atoi(argv[4]);
     tol     = atof(argv[5]);
     msqr    = atof(argv[6]);
     lambda  = atof(argv[7]);
     Levels  = atoi(argv[8]);
     src_pos = atoi(argv[9]);
-    cout<<"FLAG"<<endl;
-    //if(atof(argv[11]) == 0) C_msqr = -0.0126762/msqr + 0.0689398*msqr + 2.02509;
+    
     if(atof(argv[10]) == 0) C_msqr = -0.0126762/msqr + 0.0689398*msqr + 2.02509;
     else C_msqr = atof(argv[10]);
-    cout<<"FLAG"<<endl;
-    //if(atof(argv[12]) == 0) N_latt = 0.294452/(msqr + 0.766901) + 0.0788137;
+    
     if(atof(argv[11]) == 0) N_latt = 0.294452/(msqr + 0.766901) + 0.0788137;
     else N_latt = atof(argv[11]);
-    cout<<"FLAG"<<endl;
+    
     q = atoi(argv[12]);
-    n_shift = atoi(argv[13]);
-    cout<<"FLAG END"<<endl;
+    n_shift = atoi(argv[13]);    
   }
 };
 
 class Vertex{
  public:
-  //int nn[11] = {0,0,0,0,0,0,0,0,0,0,0};
-  //int fwdLinks;
-  complex<Float> z;
+
   double temporal_weight = 1.0;
 
   //If the pos value is -1, it is not connected
@@ -152,7 +144,7 @@ class Vertex{
   int fwdLinks;
 
   //Positon on the Poincare disk.
-  //std::complex<double> z;
+  complex<Float> z;
   
   //Phi field value at this vertex.
   double phi = 0.0;
@@ -266,7 +258,6 @@ void GetComplexPositions(Graph &NodeList, Param& P){
 
   int q = P.q;
   int Levels = P.Levels;
-  int T_offset = endNode(P.Levels,P)+1;
   
   if(P.Vcentre == true) {
     //Assume for now that the origin (level 0) is a vertex
@@ -332,12 +323,6 @@ void GetComplexPositions(Graph &NodeList, Param& P){
       }
     }
   }
-
-  if(P.t > 1) {
-    //Copy all 2D complex positions along the cylinder
-    for(long unsigned int n=0; n<endNode(P.Levels,P)+1; n++) 
-      for(int t=1; t<P.t; t++) NodeList[n + T_offset*t].z = NodeList[n].z;
-  }
 }
 
 //- For each node n, with a link to another node,
@@ -347,24 +332,21 @@ void ConnectivityCheck(Graph &NodeList, Param P){
 
   int q = P.q;
   int Levels = P.Levels;
-  int T = P.t;
-  int TotNumber = T*(endNode(Levels,P)+1);
-  int t_offset  = 0;
-  T == 1 ? t_offset = 0 : t_offset = 2;
+  int TotNumber = (endNode(Levels,P)+1);
   
   //Object to hold boolean values of graph connectivity.
   vector<Vertex> AuxNodeList(TotNumber);
   //Initialise to 0.
   for(int n = 0; n <TotNumber;n++)
-    for(int mu = 0; mu < q+t_offset; mu++) {
+    for(int mu = 0; mu < q; mu++) {
       AuxNodeList[n].nn[mu] = 0;
     }
   
   for(long unsigned int n=0; n<TotNumber; n++) {
-    for(int m=0; m<q+t_offset; m++) {
+    for(int m=0; m<q; m++) {
       //Check that the link is valid
       if(NodeList[n].nn[m] != -1) {
-	for(int p=0; p<q+t_offset; p++) {
+	for(int p=0; p<q; p++) {
 	  //Loop over all links on the linked node,
 	  //check if original node exists in neighbour
 	  //table.
@@ -382,40 +364,32 @@ void ConnectivityCheck(Graph &NodeList, Param P){
 void PrintNodeTables(const vector<Vertex> NodeList, Param P) {
 
   int q = P.q;
-  int Levels = P.Levels;  
-  int T = P.t;
-  int t_offset  = 0;
-  T == 1 ? t_offset = 0 : t_offset = 2;
+  int Levels = P.Levels;
   
-  for(int t=0; t<T; t++) {
-
-    int offset = t*( endNode(Levels,P) + 1 );
-    
-    cout << endl << "lev = " << 0 << "  T = " << t << endl;
-    
-    if(P.Vcentre) {
-      cout << endl<< " Node number = " << 0 + offset << " : ";
-      for(int i = 0; i < q+t_offset; i++) cout << NodeList[offset + 0].nn[i] << "  ";
-    }      
-    else {
-      for(long unsigned int n = 0; n < endNode(0,P)+1; n++) {
-	cout << endl<< " Node number = " << n + offset << " FL="<<NodeList[n].fwdLinks<<" : ";
-	for(int i = 0; i < q+t_offset; i++) cout << NodeList[offset + n].nn[i] << "  ";
-      } 
+  cout << endl << "lev = " << 0 << endl;
+  
+  if(P.Vcentre) {
+    cout << endl<< " Node number = " << 0 << " : ";
+    for(int i = 0; i < q; i++) cout << NodeList[0].nn[i] << "  ";
+  }      
+  else {
+    for(long unsigned int n = 0; n < endNode(0,P)+1; n++) {
+      cout << endl<< " Node number = " << n << " FL="<<NodeList[n].fwdLinks<<" : ";
+      for(int i = 0; i < q; i++) cout << NodeList[n].nn[i] << "  ";
+    } 
+  }
+  for(int lev = 1; lev < Levels+1; lev++)  {
+    cout << endl << "lev = " << lev << endl;
+    for(long unsigned int n = endNode(lev-1,P)+1; n < endNode(lev,P)+1; n++) {
+      cout << endl<< " Node number = " << n << " FL="<<NodeList[n].fwdLinks<<" : ";
+      for(int i = 0; i < q; i++) cout << NodeList[n].nn[i] << "  ";
     }
-    for(int lev = 1; lev < Levels+1; lev++)  {
-      cout << endl << "lev = " << lev << "  T = " << t << endl;
-      for(long unsigned int n = endNode(lev-1,P)+1; n < endNode(lev,P)+1; n++) {
-	cout << endl<< " Node number = " << n + offset << " FL="<<NodeList[n].fwdLinks<<" : ";
-	for(int i = 0; i < q+t_offset; i++) cout << NodeList[offset + n].nn[i] << "  ";
-      }
-    }      
-  }  
+  }   
   cout<<endl;
 }
 
 void PrintComplexPositions(const vector<Vertex> NodeList, Param P) {
-
+  
   int Levels = P.Levels;
   
   if(P.verbosity) cout<<endl<<"#Printing for Level 0"<<endl;
@@ -549,92 +523,79 @@ void CheckEdgeLength(const vector<Vertex> NodeList, Param P) {
 //Data file for lattice/analytical propagator data,
 void Bulk2Bdry(vector<Vertex> NodeList, Float *phi, Param p) 
 {
-  long unsigned int TotNumber = (endNode(p.Levels,p) + 1) * p.t;
+  long unsigned int TotNumber = (endNode(p.Levels,p) + 1);
   Float norm = 0.0;
   for(long unsigned int i = 0;i < TotNumber; i++) norm += phi[i]*phi[i];
   for(long unsigned int i = 0;i < TotNumber; i++) phi[i] /= sqrt(norm); 
   long unsigned int j = p.src_pos;
 
-  int T = p.t;
-  int T_offset = 0;
   Float theta = 0.0;
-  Float delta = p.t < 2 ? 0.5 + sqrt(0.25 + p.msqr) : 1.0 + sqrt(1 + p.msqr);
+  Float delta = 0.5 + sqrt(0.25 + p.msqr);
   complex<Float> ratio;
   complex<Float> src = NodeList[j].z;
 
-  //Loop over timeslices
-  for(int t=0; t<T; t++) {
-    T_offset = (endNode(p.Levels,p) + 1) * t;
-
-    //Loop over circumference levels
-    for(int lev=0; lev<p.Levels; lev++) {
-      /*  
-      sprintf(p.fname, "PROP_q%d_Lev%d_T%d_msqr%.3Le_srct0_srcpos%d_sinkt%dLev%d_%s_%s.dat",
-	      p.q,
-	      p.Levels,
-	      p.t,
-	      (Float)p.msqr,
-	      p.src_pos,
-	      t,
-	      lev+1,
-	      p.bc == true ? "Dirichlet" : "Neumann",
-	      p.Vcentre == true ? "Vertex" : "Circum");
-      FILE *fp1;
-      fp1=fopen(p.fname, "w");
-      */
-      //Loop over H2 disk
-      for(long unsigned int k = endNode(lev,p)+1; k < endNode(lev+1,p)+1; k++) {
-	
-	//Construct i
-	int i = k + T_offset;
-	complex<Float> snk = NodeList[i].z;
-	ratio = NodeList[i].z/NodeList[j].z;
-	theta = atan2( ratio.imag() , ratio.real() );
-	
-	//index divided by disk size, using the int floor feature/bug,
-	//gives the timeslice for each index.
-	int t1 = j / (TotNumber/p.t);
-	int t2 = i / (TotNumber/p.t);
-	//Assume PBC.
-	int delta_t = (t2-t1) > p.t/2 ? (t2-t1) - p.t : (t2-t1);
-
-	//Float geo_dist = d12(src,snk);
-	Float r = abs(NodeList[i].z);
-	Float r_p = abs(NodeList[j].z);
-	//Float xi = (cosh(delta_t)*(1+r)*(1+r_p) - 4*r*r_p*cos(theta)) / ((1-r)*(1-r_p));
-	//Float analytic_prop = log( exp(-delta*sigma(src,snk,delta_t)) /
-	//(1 - exp(-2*sigma(src,snk,delta_t))));
-	/*
+  //Loop over circumference levels
+  for(int lev=0; lev<p.Levels; lev++) {
+    /*  
+	sprintf(p.fname, "PROP_q%d_Lev%d_T%d_msqr%.3Le_srct0_srcpos%d_sinkt%dLev%d_%s_%s.dat",
+	p.q,
+	p.Levels,
+	p.t,
+	(Float)p.msqr,
+	p.src_pos,
+	t,
+	lev+1,
+	p.bc == true ? "Dirichlet" : "Neumann",
+	p.Vcentre == true ? "Vertex" : "Circum");
+	FILE *fp1;
+	fp1=fopen(p.fname, "w");
+    */
+    //Loop over H2 disk
+    for(long unsigned int k = endNode(lev,p)+1; k < endNode(lev+1,p)+1; k++) {
+      
+      //Construct i
+      int i = k;
+      complex<Float> snk = NodeList[i].z;
+      ratio = NodeList[i].z/NodeList[j].z;
+      theta = atan2( ratio.imag() , ratio.real() );
+      
+      //Float geo_dist = d12(src,snk);
+      Float r = abs(NodeList[i].z);
+      Float r_p = abs(NodeList[j].z);
+      //Float xi = (cosh(delta_t)*(1+r)*(1+r_p) - 4*r*r_p*cos(theta)) / ((1-r)*(1-r_p));
+      //Float analytic_prop = log( exp(-delta*sigma(src,snk,delta_t)) /
+      //(1 - exp(-2*sigma(src,snk,delta_t))));
+      /*
 	if( i != j )  {
-	  fprintf(fp1, "%d %d %.8Le %.8Le %.8Le %.8Le %.8Le %.8Le %.8Le \n",
-		  //1 Timeslice, 2 H2 pos
-		  t, i,
-		  
-		  //3 source/sink angle
-		  (Float)theta,
-		  
-		  //4 lattice prop
-		  (Float)p.N_latt*(Float)phi[i],
-		  
-		  //5 invariant
-		  1.0/xi,
-		  //(Float)( ((Float)1.0-abs(snk))*((Float)1.0-abs(src))/(pow(abs(snk - src),2))),
-		  
-		  //6 AdS2p1 formula
-		  (Float)(exp(-delta*sigma(src,snk,delta_t)) / (1 - exp(-2*sigma(src,snk,delta_t)))),
-
-		  //7 geodesic
-		  (Float)sigma(src,snk,delta_t),
-
-		  //8 analytic propagator
-		  analytic_prop,
-		  
-		  //9 d12
-		  geo_dist
-		  );
-	*/
-      }
+	fprintf(fp1, "%d %d %.8Le %.8Le %.8Le %.8Le %.8Le %.8Le %.8Le \n",
+	//1 Timeslice, 2 H2 pos
+	t, i,
+	
+	//3 source/sink angle
+	(Float)theta,
+	
+	//4 lattice prop
+	(Float)p.N_latt*(Float)phi[i],
+	
+	//5 invariant
+	1.0/xi,
+	//(Float)( ((Float)1.0-abs(snk))*((Float)1.0-abs(src))/(pow(abs(snk - src),2))),
+	
+	//6 AdS2p1 formula
+	(Float)(exp(-delta*sigma(src,snk,delta_t)) / (1 - exp(-2*sigma(src,snk,delta_t)))),
+	
+	//7 geodesic
+	(Float)sigma(src,snk,delta_t),
+	
+	//8 analytic propagator
+	analytic_prop,
+	
+	//9 d12
+	geo_dist
+	);
+      */
     }
+    
     //fclose(fp1);
   }
 }

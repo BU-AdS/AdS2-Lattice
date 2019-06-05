@@ -3,7 +3,7 @@
 #============================================================
 
 #Your path to Eigen
-EIGEN=/Users/deanhowarth/Eigen
+EIGEN=/share/pkg/eigen/3.3.4/install/include/eigen3
 
 TARGET	    = spectrum
 C_SOURCES   = ads_graph.cpp 
@@ -11,9 +11,9 @@ C_OBJS      = ads_graph.o
 MY_INCLUDES = graph.h util.h cg.h cg_multishift.h eigen.h graph.h 
 
 CCX = g++ -std=c++11
-CXXFLAGS = -O2 -g -Wall -std=c++11 -I${EIGEN} -I. -Wall -Wno-sign-compare
+CXXFLAGS = -O2 -g -Wall -std=c++11 -I${EIGEN} -I. -I/share/pkg/gsl/2.3/install/include -Wall -Wno-sign-compare
 
-LIBDIRS = -lgsl
+LIBDIRS = /share/pkg/gsl/2.3/install/lib/libgsl.a
 
 #============================================================
 all: $(TARGET)

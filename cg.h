@@ -8,88 +8,64 @@
 using namespace std;
 
 int Mphi(Float *phi, const Float *phi0,
-	 const vector<Vertex> NodeList, Param &P) {
+	 const vector<Vertex> NodeList, Param P) {
 
   int Levels = P.Levels;
   int q = P.q;
-  int T = P.t;
   Float msqr = P.msqr;
   Float C_msqr = P.C_msqr;
   bool bc = P.bc;
   int InternalNodes = endNode(Levels-1,P)+1;
   int TotNumber = endNode(Levels,P)+1;
-  int offset = TotNumber;
-  int T_offset = 0;
-  T == 1 ? T_offset = 0 : T_offset = 2;
   
-  for(int i=0; i<T*TotNumber; i++) {    
+  for(int i=0; i<TotNumber; i++) {    
     //cout<<"Initial Mphi pass phi at "<<i<<" is "<<phi[i]<<endl;
     //cout<<"Initial Mphi pass phi0 at "<<i<<" is "<<phi0[i]<<endl;
   }
-  
-  
-  for(int t = 0; t<T; t++) {
-
-    //loop over interior nodes on all disks    
-    for(int i = t*offset; i < t*offset + InternalNodes; i++) {
-      
-      //mass term
-      phi[i] = C_msqr*msqr * phi0[i];    
-      
-      //Spatial links
-      for(int mu = 0; mu < q; mu++) {
-	//cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
-	phi[i] += (phi0[i] - phi0[NodeList[i].nn[mu]]);
-      }
-      
-      //Temporal links
-      if(T>1) {
-	for(int mu = q; mu < q+T_offset; mu++) {
-	  //cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
-	  phi[i] += (phi0[i] - phi0[NodeList[i].nn[mu]]);
-	}
-      }
-    }
+ 
+  //loop over interior nodes on all disks    
+  for(int i = 0; i < InternalNodes; i++) {
     
-    //Dirichlet or Neuman at Exterior Nodes.  
-    for(int i = t*offset + InternalNodes; i < t*offset + TotNumber; i++){
+    //mass term
+    phi[i] = C_msqr*msqr * phi0[i];    
+    
+    //Spatial links
+    for(int mu = 0; mu < q; mu++) {
+      //cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
+      phi[i] += (phi0[i] - phi0[NodeList[i].nn[mu]]);
+    }    
+  }
+  
+  //Dirichlet or Neuman at Exterior Nodes.  
+  for(int i = InternalNodes; i < TotNumber; i++){
+    
+    //cout<<"Exterior i="<<i<<" t="<<t<<endl;
+    //mass term
+    phi[i] = C_msqr*msqr * phi0[i];
+    
+    //Spatial links
+    //the zeroth link is always on the same level.
+    phi[i] += phi0[i] - phi0[NodeList[i].nn[0]];
       
-      //cout<<"Exterior i="<<i<<" t="<<t<<endl;
-      //mass term
-      phi[i] = C_msqr*msqr * phi0[i];
-      
-      //Spatial links
-      //the zeroth link is always on the same level.
-      phi[i] += phi0[i] - phi0[NodeList[i].nn[0]];
-      
-      //The q-1 (and q-2) link(s) go back one level,
-      //the q-3 (or q-2) link is on the same level. These
-      //links are always computed in the same way.
-      for(int mu = q-1; mu > (NodeList[i].fwdLinks); mu--) {
-	//cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
-	phi[i] += phi0[i] - phi0[NodeList[i].nn[mu]];
-      }      
-      
-      //We use the member data fwdLinks to apply the boundary
-      //condition. For Dirichlet, the field value is 0. For
-      //Neumann, the derivative is zero.
-      for(int mu = NodeList[i].fwdLinks; mu > 0; mu--) {
-	if(bc == true) {
-	  //Apply Dirchlet BC.
-	  phi[i] += phi0[i];
-	} else {
-	  //Apply Neumann
-	  phi[i] += 0.0;
-	}
+    //The q-1 (and q-2) link(s) go back one level,
+    //the q-3 (or q-2) link is on the same level. These
+    //links are always computed in the same way.
+    for(int mu = q-1; mu > (NodeList[i].fwdLinks); mu--) {
+      //cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
+      phi[i] += phi0[i] - phi0[NodeList[i].nn[mu]];
+    }      
+    
+    //We use the member data fwdLinks to apply the boundary
+    //condition. For Dirichlet, the field value is 0. For
+    //Neumann, the derivative is zero.
+    for(int mu = NodeList[i].fwdLinks; mu > 0; mu--) {
+      if(bc == true) {
+	//Apply Dirchlet BC.
+	phi[i] += phi0[i];
+      } else {
+	//Apply Neumann
+	phi[i] += 0.0;
       }
-      
-      //Temporal links at exterior
-      if(T>1) {
-	for(int mu = q; mu < q+T_offset; mu++) {
-	  //cout<<"i="<<i<<" mu="<<mu<<" phi0="<<phi0[i]<<" phi0["<<NodeList[i].nn[mu]<<"]="<<phi0[NodeList[i].nn[mu]]<<endl;
-	  phi[i] += (phi0[i] - phi0[NodeList[i].nn[mu]]);
-	}
-      }    
     }
   }
   return 0;  
@@ -97,12 +73,12 @@ int Mphi(Float *phi, const Float *phi0,
 
 
 Float Minv_phi(Float *phi, Float *b,
-	       const vector<Vertex> NodeList, Param &P) {
+	       const vector<Vertex> NodeList, Param P) {
   // CG solutions to Mphi = b 
   //  see http://en.wikipedia.org/wiki/Conjugate_gradient_method
   int Levels = P.Levels;
   int diskN = endNode(Levels,P) + 1;
-  int TotNumber = P.t*diskN;
+  int TotNumber = diskN;
   
   Float *res, *resNew, *pvec, *Mpvec, *pvec_tmp;  
   res      = new Float[TotNumber];
@@ -188,7 +164,7 @@ Float Minv_phi(Float *phi, Float *b,
 }
 
 
-void latticeScaling(const vector<Vertex> NodeList, Param &p)
+void latticeScaling(const vector<Vertex> NodeList, Param p)
 {
   cout<<"In!"<<"\n";
   int latVol  = p.latVol;
@@ -201,9 +177,8 @@ void latticeScaling(const vector<Vertex> NodeList, Param &p)
   double theta, r, r_p;
   complex<double> ratio;
   complex<double> snk;
-  double* analytic_prop = new double[outer_cirum/2];
-  double* xi_invariant  = new double[outer_cirum/2];
-
+  double* analytic_prop = new double[outer_cirum];
+  double* xi_invariant  = new double[outer_cirum];
  
   // Construct the xi invariant and the analytic propagator
   
@@ -258,7 +233,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param &p)
   ifstream fileInput;
   string line;
   char params[256];
-  sprintf(params, "%d %d %.4f", p.q, p.Levels, p.msqr);
+  sprintf(params, "%d %d %.4Le", p.q, p.Levels, p.msqr);
   char* search = params;
   unsigned int curLine = 0;
   // open file to search
@@ -318,7 +293,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param &p)
     //prop (w.r.t the xi invariant) to compute the relevant
     //scaling and normalsation.
     
-    double* latt_prop  = new double[outer_cirum/2];
+    double* latt_prop  = new double[outer_cirum];
 
     //Loop over H2 disk
     for(long unsigned int k = 0; k < outer_cirum; k++) {
@@ -374,7 +349,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param &p)
   //If this is a new problem, and it tuned properly, save the data.
   if(!preTuned && tuneWin) {
     FILE *file = fopen("ads_wisdom", "a");
-    fprintf(file,"%d %d %.4f\n%f\n%f\n",
+    fprintf(file,"%d %d %.4Le\n%Le\n%Le\n",
 	    p.q, p.Levels, p.msqr,
 	    p.N_latt,
 	    p.C_msqr);

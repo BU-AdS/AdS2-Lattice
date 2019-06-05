@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
   //Print graph endnode info
   //for(int i=1; i<20; i++) cout<<"Endnode("<<i<<") = "<<endNode(i,p)<<endl;
-  int TotNumber = (endNode(p.Levels,p) + 1) * p.t;
+  int TotNumber = (endNode(p.Levels,p) + 1);
   
   vector<Vertex> NodeList(TotNumber);
   vector<Vertex> NodeList1(TotNumber);
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
   //Initialise. -1 in NodeList indicates that node is not yet populated.
   for(int n = 0; n <TotNumber;n++)
-    for(int mu = 0; mu < p.q+2; mu++) { 
+    for(int mu = 0; mu < p.q; mu++) { 
       NodeList[n].nn[mu] = -1;
       NodeList1[n].nn[mu] = -1;
       NodeList2[n].nn[mu] = -1;
@@ -113,120 +113,120 @@ int main(int argc, char **argv)
       cout<<endl;
       exit(0);
     }
-
-  #if 1
-
+  
+#if 1
+  
   /******************************/
 
-//   for(int iteration=0; iteration < 1; iteration++){
-//     cout<<"Iteration "<<iteration<<"\n";
-//   //----------------//
-//   // (H)MC routines //
-//   //----------------//
+  //   for(int iteration=0; iteration < 1; iteration++){
+  //     cout<<"Iteration "<<iteration<<"\n";
+  //   //----------------//
+  //   // (H)MC routines //
+  //   //----------------//
 
-//   //Fake out
-//   //If we want to compute the lattice action, we need a momentum field.  
-//   Float mom[p.AdSVol];
-//   zeroField(mom, p);
+  //   //Fake out
+  //   //If we want to compute the lattice action, we need a momentum field.  
+  //   Float mom[p.AdSVol];
+  //   zeroField(mom, p);
 
-//   int accept = 0;
-//   int count1 = 0;
+  //   int accept = 0;
+  //   int count1 = 0;
   
-//   //Initialize Lattice
-//   for(int i = 0; i<p.latVol; i++) {
-//     NodeList[i].phi = 2.0*drand48() - 1.0;
-//     NodeList1[i].phi = 2.0*drand48() - 1.0;
-//     NodeList2[i].phi = 2.0*drand48() - 1.0;
-//     NodeList3[i].phi = 2.0*drand48() - 1.0;
-//     NodeList4[i].phi = 2.0*drand48() - 1.0;
-//   }
-//   //Loop over warmup iterations
-//   for(int iter=0; iter<p.n_therm; iter++) {
-//     //accept = hmc(Lattice, p, iter);    
-//     heatbath(NodeList, p, iter);
-//     heatbath(NodeList1, p, iter);
-//     heatbath(NodeList2, p, iter);
-//     heatbath(NodeList3, p, iter);
-//     heatbath(NodeList4, p, iter);
-//   }
-//   //Loop over warmup iterations
-//   for(int iter=p.n_therm; iter<p.n_therm + p.n_meas; iter++) {
+  //   //Initialize Lattice
+  //   for(int i = 0; i<p.latVol; i++) {
+  //     NodeList[i].phi = 2.0*drand48() - 1.0;
+  //     NodeList1[i].phi = 2.0*drand48() - 1.0;
+  //     NodeList2[i].phi = 2.0*drand48() - 1.0;
+  //     NodeList3[i].phi = 2.0*drand48() - 1.0;
+  //     NodeList4[i].phi = 2.0*drand48() - 1.0;
+  //   }
+  //   //Loop over warmup iterations
+  //   for(int iter=0; iter<p.n_therm; iter++) {
+  //     //accept = hmc(Lattice, p, iter);    
+  //     heatbath(NodeList, p, iter);
+  //     heatbath(NodeList1, p, iter);
+  //     heatbath(NodeList2, p, iter);
+  //     heatbath(NodeList3, p, iter);
+  //     heatbath(NodeList4, p, iter);
+  //   }
+  //   //Loop over warmup iterations
+  //   for(int iter=p.n_therm; iter<p.n_therm + p.n_meas; iter++) {
 
-//     count1++;
-//     double Hold = measH(NodeList, mom, p);
-//     heatbath(NodeList, p, iter);
-//     heatbath(NodeList1, p, iter);
-//     heatbath(NodeList2, p, iter);
-//     heatbath(NodeList3, p, iter);
-//     heatbath(NodeList4, p, iter);
-//     double H = measH(NodeList, mom, p);
-//     //accepted += hmc(Lattice, p, iter);
-//     //cout << iter << " " << setprecision(16) << (1.0*accepted_metropolis)/((iter+1)*p.AdSVol) << " " << H << " " << (H-Hold) << endl; 
-//   }
+  //     count1++;
+  //     double Hold = measH(NodeList, mom, p);
+  //     heatbath(NodeList, p, iter);
+  //     heatbath(NodeList1, p, iter);
+  //     heatbath(NodeList2, p, iter);
+  //     heatbath(NodeList3, p, iter);
+  //     heatbath(NodeList4, p, iter);
+  //     double H = measH(NodeList, mom, p);
+  //     //accepted += hmc(Lattice, p, iter);
+  //     //cout << iter << " " << setprecision(16) << (1.0*accepted_metropolis)/((iter+1)*p.AdSVol) << " " << H << " " << (H-Hold) << endl; 
+  //   }
 
 
-//   //-------------//
-//   // CG routines //
-//   //-------------//
+  //   //-------------//
+  //   // CG routines //
+  //   //-------------//
 
-//   //cout<<"In the CG routines"<<"\n";
-//   double phi_prop = 0.0;
-//   double dist = 0.0;
-//   double **phi_prop_array = new double*[TotNumber]; 
-//   double **dist_array = new double*[TotNumber];
-//   for(int i=0; i<TotNumber; i++)
-//     {
-//       phi_prop_array[i] = new double[TotNumber];
-//       dist_array[i] = new double[TotNumber];
-//     }
-//   for(int i=0; i<TotNumber; i++)
-//     {
-//       for(int j=0; j<TotNumber; j++)
-// 	{
-// 	  phi_prop_array[i][j] = 0.0;
-// 	  dist_array[i][j] = 0.0;
-// 	}
-//     }
+  //   //cout<<"In the CG routines"<<"\n";
+  //   double phi_prop = 0.0;
+  //   double dist = 0.0;
+  //   double **phi_prop_array = new double*[TotNumber]; 
+  //   double **dist_array = new double*[TotNumber];
+  //   for(int i=0; i<TotNumber; i++)
+  //     {
+  //       phi_prop_array[i] = new double[TotNumber];
+  //       dist_array[i] = new double[TotNumber];
+  //     }
+  //   for(int i=0; i<TotNumber; i++)
+  //     {
+  //       for(int j=0; j<TotNumber; j++)
+  // 	{
+  // 	  phi_prop_array[i][j] = 0.0;
+  // 	  dist_array[i][j] = 0.0;
+  // 	}
+  //     }
   
-//   for(int i=0; i<TotNumber; i++)
-//     {
-//       for(int j=0; j<i; j++)
-// 	{
-// 	  //cout<<"i and j are: "<<i<<" "<<j<<"\n";
-// 	  phi_prop_array[i][j] = NodeList[i].phi*NodeList[j].phi;
-// 	  dist_array[i][j] = abs(NodeList[i].z - NodeList[j].z);  
-// 	  //cout<<"NodesList[i].phi is: "<<phi_prop_array[i][j]<<"\n";
-// 	}
-//     }
+  //   for(int i=0; i<TotNumber; i++)
+  //     {
+  //       for(int j=0; j<i; j++)
+  // 	{
+  // 	  //cout<<"i and j are: "<<i<<" "<<j<<"\n";
+  // 	  phi_prop_array[i][j] = NodeList[i].phi*NodeList[j].phi;
+  // 	  dist_array[i][j] = abs(NodeList[i].z - NodeList[j].z);  
+  // 	  //cout<<"NodesList[i].phi is: "<<phi_prop_array[i][j]<<"\n";
+  // 	}
+  //     }
   
   
-//   cout<<"POOP: "<<phi_prop_array[1][1]<<" "<<dist_array[1][1]<<"\n";
+  //   cout<<"POOP: "<<phi_prop_array[1][1]<<" "<<dist_array[1][1]<<"\n";
 	
-//   ofstream myfile10;
-//   myfile10.open("BrutePhi"+std::to_string(iteration)+".dat");
-//   for(int i=0; i<TotNumber; i++)
-//   {
-//     for(int j=0; j<i; j++)
-//       {
-// 	myfile10<<phi_prop_array[i][j]<<" "<<dist_array[i][j]<<"\n";
-//        }
-//   }
-//   myfile10.close();
+  //   ofstream myfile10;
+  //   myfile10.open("BrutePhi"+std::to_string(iteration)+".dat");
+  //   for(int i=0; i<TotNumber; i++)
+  //   {
+  //     for(int j=0; j<i; j++)
+  //       {
+  // 	myfile10<<phi_prop_array[i][j]<<" "<<dist_array[i][j]<<"\n";
+  //        }
+  //   }
+  //   myfile10.close();
 
 
-//   //Bulk-boundary propagator
-//   Float* phi0 = new Float[TotNumber];   
-//   Float* b0 = new Float[TotNumber];
-//   for(int i=0; i<TotNumber; i++)
-//     {
-//       phi0[i] = NodeList[i].phi;
-//       b0[i] = 0.0;
-//     }
+  //   //Bulk-boundary propagator
+  //   Float* phi0 = new Float[TotNumber];   
+  //   Float* b0 = new Float[TotNumber];
+  //   for(int i=0; i<TotNumber; i++)
+  //     {
+  //       phi0[i] = NodeList[i].phi;
+  //       b0[i] = 0.0;
+  //     }
 
-//   b0[p.src_pos] = 1;
-//   Float truesq1 = 0.0;
-//   truesq1 = Minv_phi(phi0, b0, NodeList, p);
-//   Bulk2Bdry(NodeList, phi0, p);
+  //   b0[p.src_pos] = 1;
+  //   Float truesq1 = 0.0;
+  //   truesq1 = Minv_phi(phi0, b0, NodeList, p);
+  //   Bulk2Bdry(NodeList, phi0, p);
   
 
 
@@ -238,11 +238,11 @@ int main(int argc, char **argv)
   Float* phibdry = new Float[TotNumber];
   Float* bbdry = new Float[TotNumber];
   for(int i=0; i<TotNumber; i++)
-    {
-      //phibdry[i] = 0.0;
-      phibdry[i] = NodeList[i].phi;
-      bbdry[i] = 0.0;
-    }
+  {
+  //phibdry[i] = 0.0;
+  phibdry[i] = NodeList[i].phi;
+  bbdry[i] = 0.0;
+  }
   bbdry[p.src_pos] = 100000000.0;
   Float truesq2 = 0.0;
   truesq2 = Minv_phi(phibdry, bbdry, NodeList, p);
@@ -269,33 +269,30 @@ int main(int argc, char **argv)
   int outer_num = endNode(p.Levels,p)-endNode(p.Levels-1,p)+1;
   Float* phirad1_array = new Float[outer_num];
   /*
-  for(int j=0; j<outer_num; j++)
+    for(int j=0; j<outer_num; j++)
     {
-      phirad1_array[j] = phirad[j+endNode(p.Levels-1,p)+1];
+    phirad1_array[j] = phirad[j+endNode(p.Levels-1,p)+1];
  
-      Float* phirad1 = new Float[TotNumber];
-      Float* brad1 = new Float[TotNumber];
-      for(int i=0; i<TotNumber; i++)
-	{
-	  phirad1[i] = 0.0;
-	  brad1[i] = 0.0;
-	}
-      brad1[j+endNode(p.Levels-1,p)+1] = 1;
-      Float truesq2 = 0.0;
-      truesq2 = Minv_phi(phirad1, brad1, NodeList, p);
-      //Bulk2Bdry(NodeList, phirad1, p);
-      //cout<<"here "<<j<<"\n";
-      phirad1_array[j] = phirad1[0];
-      delete[] phirad1;
-      delete[] brad1;
+    Float* phirad1 = new Float[TotNumber];
+    Float* brad1 = new Float[TotNumber];
+    for(int i=0; i<TotNumber; i++)
+    {
+    phirad1[i] = 0.0;
+    brad1[i] = 0.0;
+    }
+    brad1[j+endNode(p.Levels-1,p)+1] = 1;
+    Float truesq2 = 0.0;
+    truesq2 = Minv_phi(phirad1, brad1, NodeList, p);
+    //Bulk2Bdry(NodeList, phirad1, p);
+    //cout<<"here "<<j<<"\n";
+    phirad1_array[j] = phirad1[0];
+    delete[] phirad1;
+    delete[] brad1;
       
-      //cout<<"At number "<<j<<" out of "<<outer_num<<"\n";
-   }
+    //cout<<"At number "<<j<<" out of "<<outer_num<<"\n";
+    }
   */
   delete[] phirad;
-  
-
-
   
   ofstream myfile1;
   myfile1.open ("phirad.dat");
@@ -334,296 +331,296 @@ int main(int argc, char **argv)
 
 
   //cout<<"After radial bulk-bound"<<"\n";
-
+  
 
   latticeScaling(NodeList, p);
 
 
-//   //Four-point contact term
-//   //Strategy: loop over configurations. For each configuration, loop over
-//   //which of the four sources CG is called on. 
-//   int temp = src_array[2];
-//   int count = 0;
-//   //Float Amp4 = 0.0;
-//   Float prop = 1.0;
-//   Float* Amp_ana = new Float[outer_configs];
-//   Float* Amp_array = new Float[outer_configs]; 
-//   Float* Amp_pos_array = new Float[outer_configs];
-//   Float* u_array = new Float[outer_configs];
-//   Float* src_pos3_array = new Float[outer_configs];
-//   Float* fourpt_info = new Float[outer_configs];
-//   Float* fourpt_num = new Float[outer_configs];
-//   for(int src_pos3 = temp; src_pos3 < src_array[3]; src_pos3++)
-//     {
-//       //cout<<"src_pos3 is: "<<src_pos3<<" out of "<<src_array[3]<<"\n";
-//       Float xr12 = NodeList[src_pos1].z.real()-NodeList[src_pos2].z.real();
-//       Float xr34 = NodeList[src_pos3].z.real()-NodeList[src_pos4].z.real();
-//       Float xr13 = NodeList[src_pos1].z.real()-NodeList[src_pos3].z.real();
-//       Float xr24 = NodeList[src_pos2].z.real()-NodeList[src_pos4].z.real();
-//       Float xi12 = NodeList[src_pos1].z.imag()-NodeList[src_pos2].z.imag();
-//       Float xi34 = NodeList[src_pos3].z.imag()-NodeList[src_pos4].z.imag();
-//       Float xi13 = NodeList[src_pos1].z.imag()-NodeList[src_pos3].z.imag();
-//       Float xi24 = NodeList[src_pos2].z.imag()-NodeList[src_pos4].z.imag();
-//       Float u_cr = ((xr12*xr12+xi12*xi12)*(xr34*xr34+xi34*xi34))/((xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24));
-//       Float Dfunction =    (sqrt(M_PI)/(2*(xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24)))*((-2*log(1- sqrt(u_cr)))/(sqrt(u_cr)) + log(u_cr)/(sqrt(u_cr)-1));
+  //   //Four-point contact term
+  //   //Strategy: loop over configurations. For each configuration, loop over
+  //   //which of the four sources CG is called on. 
+  //   int temp = src_array[2];
+  //   int count = 0;
+  //   //Float Amp4 = 0.0;
+  //   Float prop = 1.0;
+  //   Float* Amp_ana = new Float[outer_configs];
+  //   Float* Amp_array = new Float[outer_configs]; 
+  //   Float* Amp_pos_array = new Float[outer_configs];
+  //   Float* u_array = new Float[outer_configs];
+  //   Float* src_pos3_array = new Float[outer_configs];
+  //   Float* fourpt_info = new Float[outer_configs];
+  //   Float* fourpt_num = new Float[outer_configs];
+  //   for(int src_pos3 = temp; src_pos3 < src_array[3]; src_pos3++)
+  //     {
+  //       //cout<<"src_pos3 is: "<<src_pos3<<" out of "<<src_array[3]<<"\n";
+  //       Float xr12 = NodeList[src_pos1].z.real()-NodeList[src_pos2].z.real();
+  //       Float xr34 = NodeList[src_pos3].z.real()-NodeList[src_pos4].z.real();
+  //       Float xr13 = NodeList[src_pos1].z.real()-NodeList[src_pos3].z.real();
+  //       Float xr24 = NodeList[src_pos2].z.real()-NodeList[src_pos4].z.real();
+  //       Float xi12 = NodeList[src_pos1].z.imag()-NodeList[src_pos2].z.imag();
+  //       Float xi34 = NodeList[src_pos3].z.imag()-NodeList[src_pos4].z.imag();
+  //       Float xi13 = NodeList[src_pos1].z.imag()-NodeList[src_pos3].z.imag();
+  //       Float xi24 = NodeList[src_pos2].z.imag()-NodeList[src_pos4].z.imag();
+  //       Float u_cr = ((xr12*xr12+xi12*xi12)*(xr34*xr34+xi34*xi34))/((xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24));
+  //       Float Dfunction =    (sqrt(M_PI)/(2*(xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24)))*((-2*log(1- sqrt(u_cr)))/(sqrt(u_cr)) + log(u_cr)/(sqrt(u_cr)-1));
 
-//       Float* prop = new Float[TotNumber-4];
-//       Float* prop1 = new Float[TotNumber-4];    
-//       Float* prop2 = new Float[TotNumber-4];    
-//       Float* prop3 = new Float[TotNumber-4];    
-//       Float* phi = new Float[TotNumber];
-//       Float* phi1 = new Float[TotNumber];
-//       Float* phi2 = new Float[TotNumber];
-//       Float* phi3 = new Float[TotNumber];
-//       Float* b   = new Float[TotNumber];
-//       Float* b1   = new Float[TotNumber]; 
-//       Float* b2   = new Float[TotNumber]; 
-//       Float* b3   = new Float[TotNumber]; 
+  //       Float* prop = new Float[TotNumber-4];
+  //       Float* prop1 = new Float[TotNumber-4];    
+  //       Float* prop2 = new Float[TotNumber-4];    
+  //       Float* prop3 = new Float[TotNumber-4];    
+  //       Float* phi = new Float[TotNumber];
+  //       Float* phi1 = new Float[TotNumber];
+  //       Float* phi2 = new Float[TotNumber];
+  //       Float* phi3 = new Float[TotNumber];
+  //       Float* b   = new Float[TotNumber];
+  //       Float* b1   = new Float[TotNumber]; 
+  //       Float* b2   = new Float[TotNumber]; 
+  //       Float* b3   = new Float[TotNumber]; 
 
-//       for(int i=0; i<TotNumber; i++) 
-// 	{
+  //       for(int i=0; i<TotNumber; i++) 
+  // 	{
 	  
-// 	  phi[i] = 0.0;
-// 	  phi1[i] = 0.0;
-// 	  phi2[i] = 0.0;
-// 	  phi3[i] = 0.0;
-// 	  b[i] = 0.0;
-// 	  b1[i] = 0.0;
-// 	  b2[i] = 0.0;
-// 	  b3[i] = 0.0;
+  // 	  phi[i] = 0.0;
+  // 	  phi1[i] = 0.0;
+  // 	  phi2[i] = 0.0;
+  // 	  phi3[i] = 0.0;
+  // 	  b[i] = 0.0;
+  // 	  b1[i] = 0.0;
+  // 	  b2[i] = 0.0;
+  // 	  b3[i] = 0.0;
 	  
-// 	  if(i<TotNumber-4) 
-// 	    {
-// 	      prop[i] = 0.0;
-// 	      prop1[i] = 0.0;
-// 	      prop2[i] = 0.0;
-// 	      prop3[i] = 0.0;
-// 	    }
-// 	}
+  // 	  if(i<TotNumber-4) 
+  // 	    {
+  // 	      prop[i] = 0.0;
+  // 	      prop1[i] = 0.0;
+  // 	      prop2[i] = 0.0;
+  // 	      prop3[i] = 0.0;
+  // 	    }
+  // 	}
       
-//       for(int src_num=0; src_num<4; src_num++)
-// 	{
-// 	  if(src_num == 0)
-// 	    {
-// 	      b[src_pos1] = 100000000;
-// 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";
-// 	      Float truesq = 0.0;
-// 	      truesq = Minv_phi(phi, b, NodeList1, p);   //Residual to this CG solution
-// 	      //cout<<"Tolerance = "<<p.tol<<" True Residual = "<<sqrt(truesq)<<endl;
+  //       for(int src_num=0; src_num<4; src_num++)
+  // 	{
+  // 	  if(src_num == 0)
+  // 	    {
+  // 	      b[src_pos1] = 100000000;
+  // 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";
+  // 	      Float truesq = 0.0;
+  // 	      truesq = Minv_phi(phi, b, NodeList1, p);   //Residual to this CG solution
+  // 	      //cout<<"Tolerance = "<<p.tol<<" True Residual = "<<sqrt(truesq)<<endl;
 	      
-// 	      //FourPoint(NodeList, phi, p, src_num, src_array, src_pos3);
+  // 	      //FourPoint(NodeList, phi, p, src_num, src_array, src_pos3);
 
-// 	      //cout<<phi[0]<<phi[1]<<"\n";
-// 	      //cout<<(Float)p.N_latt*(Float)phi[0]<<"\n";
-// 	      for(int i=0;i<TotNumber-4;i++)  
-// 		{
-// 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))
-// 		    {
-// 		      prop[i] = (Float)p.N_latt*(Float)phi[i];
-// 		    }     
-// 		}
-// 	      //cout<<prop[0]<<"\n";
-// 	    }
+  // 	      //cout<<phi[0]<<phi[1]<<"\n";
+  // 	      //cout<<(Float)p.N_latt*(Float)phi[0]<<"\n";
+  // 	      for(int i=0;i<TotNumber-4;i++)  
+  // 		{
+  // 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))
+  // 		    {
+  // 		      prop[i] = (Float)p.N_latt*(Float)phi[i];
+  // 		    }     
+  // 		}
+  // 	      //cout<<prop[0]<<"\n";
+  // 	    }
 	  
-// 	  if(src_num == 1)
-// 	    {
-// 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";   
-// 	      b1[src_pos2] = 100000000;
-// 	      Float truesq = 0.0;
-// 	      truesq = Minv_phi(phi1, b1, NodeList2, p);
-// 	      //FourPoint(NodeList, phi1, p, src_num, src_array, src_pos3);
-// 	      for(int i=0;i<TotNumber-4;i++) 
-// 		{
-// 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))
-// 		    {  
-// 		      prop1[i] = (Float)p.N_latt*(Float)phi1[i];
-// 		    }
-// 		}
-// 	    }
+  // 	  if(src_num == 1)
+  // 	    {
+  // 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";   
+  // 	      b1[src_pos2] = 100000000;
+  // 	      Float truesq = 0.0;
+  // 	      truesq = Minv_phi(phi1, b1, NodeList2, p);
+  // 	      //FourPoint(NodeList, phi1, p, src_num, src_array, src_pos3);
+  // 	      for(int i=0;i<TotNumber-4;i++) 
+  // 		{
+  // 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))
+  // 		    {  
+  // 		      prop1[i] = (Float)p.N_latt*(Float)phi1[i];
+  // 		    }
+  // 		}
+  // 	    }
 	  
-// 	  if(src_num == 2)
-// 	    {
-// 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";
-// 	      //cout<<"src_pos2 is: "<<src_pos2<<"\n";
-// 	      b2[src_pos3] = 100000000;
-// 	      Float truesq = 0.0;
-// 	      truesq = Minv_phi(phi2, b2, NodeList3, p);
-// 	      //FourPoint(NodeList, phi2, p, src_num, src_array, src_pos3);
-// 	      for(int i=0;i<TotNumber-4;i++)  
-// 		{
-// 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))  
-// 		    {
-// 		      prop2[i] = (Float)p.N_latt*(Float)phi2[i];
-// 		    }
-// 		}
-// 	    }
-// 	  if(src_num == 3)
-// 	    {
-// 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";   
-// 	      b3[src_pos4] = 100000000;
-// 	      Float truesq = 0.0;
-// 	      truesq = Minv_phi(phi3, b3, NodeList4, p);
-// 	      //FourPoint(NodeList, phi3, p, src_num, src_array, src_pos3);
-// 	      for(int i=0;i<TotNumber-4;i++) 
-// 		{
-// 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))  
-// 		    {
-// 		      prop3[i] = (Float)p.N_latt*(Float)phi3[i];
-// 		    }
-// 		}
-// 	    }
-// 	  //cout<<"AT END "<<"\n";
-// 	  //cout<<prop[0]<<", "<<prop1[0]<<", "<<prop2[0]<<", "<<prop3[0]<<"\n";
-// 	}
-//       Float Amp4 = 0.0;
-//       for(int i=0; i<TotNumber; i++)
-// 	{
-// 	  //cout<<"prop["<<i<<"] is: "<<prop[i]<<"\n";
-// 	  //cout<<"prop1["<<i<<"] is: "<<prop1[i]<<"\n";    
-// 	  //cout<<"prop2["<<i<<"] is: "<<prop2[i]<<"\n";    
-// 	  //cout<<"prop3["<<i<<"] is: "<<prop3[i]<<"\n";    
-// 	  Amp4 += prop[i]*prop1[i]*prop2[i]*prop3[i]*area3q(p.q);
-// 	  //Amp4 += (Float)p.N_latt*(Float)phi[i]*(Float)p.N_latt*(Float)phi1[i]*(Float)p.N_latt*(Float)phi2[i]*(Float)p.N_latt*(Float)phi3[i];
-// 	} 
-//       //cout<<"Amp4 is: "<<Amp4<<"\n";
-//       Amp_array[count] = Amp4;
-//       Amp_pos_array[count] = abs(NodeList[src_pos3].z);
-//       //cout<<"count is: "<<count<<"\n";
-//       //cout<<"u_cr is: "<<u_cr<<"\n";
-//       u_array[count] = u_cr;
-//       Amp_ana[count] = Dfunction;
-//       src_pos3_array[count] = src_pos3;
+  // 	  if(src_num == 2)
+  // 	    {
+  // 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";
+  // 	      //cout<<"src_pos2 is: "<<src_pos2<<"\n";
+  // 	      b2[src_pos3] = 100000000;
+  // 	      Float truesq = 0.0;
+  // 	      truesq = Minv_phi(phi2, b2, NodeList3, p);
+  // 	      //FourPoint(NodeList, phi2, p, src_num, src_array, src_pos3);
+  // 	      for(int i=0;i<TotNumber-4;i++)  
+  // 		{
+  // 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))  
+  // 		    {
+  // 		      prop2[i] = (Float)p.N_latt*(Float)phi2[i];
+  // 		    }
+  // 		}
+  // 	    }
+  // 	  if(src_num == 3)
+  // 	    {
+  // 	      //cout<<"src_num is: "<<src_num<<" and src_array[src_num] is: "<<src_array[src_num]<<"\n";   
+  // 	      b3[src_pos4] = 100000000;
+  // 	      Float truesq = 0.0;
+  // 	      truesq = Minv_phi(phi3, b3, NodeList4, p);
+  // 	      //FourPoint(NodeList, phi3, p, src_num, src_array, src_pos3);
+  // 	      for(int i=0;i<TotNumber-4;i++) 
+  // 		{
+  // 		  if( (i != src_pos1) && (i != src_pos3) && (i != src_pos4) && (i != src_pos2))  
+  // 		    {
+  // 		      prop3[i] = (Float)p.N_latt*(Float)phi3[i];
+  // 		    }
+  // 		}
+  // 	    }
+  // 	  //cout<<"AT END "<<"\n";
+  // 	  //cout<<prop[0]<<", "<<prop1[0]<<", "<<prop2[0]<<", "<<prop3[0]<<"\n";
+  // 	}
+  //       Float Amp4 = 0.0;
+  //       for(int i=0; i<TotNumber; i++)
+  // 	{
+  // 	  //cout<<"prop["<<i<<"] is: "<<prop[i]<<"\n";
+  // 	  //cout<<"prop1["<<i<<"] is: "<<prop1[i]<<"\n";    
+  // 	  //cout<<"prop2["<<i<<"] is: "<<prop2[i]<<"\n";    
+  // 	  //cout<<"prop3["<<i<<"] is: "<<prop3[i]<<"\n";    
+  // 	  Amp4 += prop[i]*prop1[i]*prop2[i]*prop3[i]*area3q(p.q);
+  // 	  //Amp4 += (Float)p.N_latt*(Float)phi[i]*(Float)p.N_latt*(Float)phi1[i]*(Float)p.N_latt*(Float)phi2[i]*(Float)p.N_latt*(Float)phi3[i];
+  // 	} 
+  //       //cout<<"Amp4 is: "<<Amp4<<"\n";
+  //       Amp_array[count] = Amp4;
+  //       Amp_pos_array[count] = abs(NodeList[src_pos3].z);
+  //       //cout<<"count is: "<<count<<"\n";
+  //       //cout<<"u_cr is: "<<u_cr<<"\n";
+  //       u_array[count] = u_cr;
+  //       Amp_ana[count] = Dfunction;
+  //       src_pos3_array[count] = src_pos3;
   
   
 
-//       /*
-//       for(int i=0; i<TotNumber-4; i++)
-// 	{
-// 	  cout<<"in prop loop"<<"\n";
-// 	  cout<<(Float)p.N_latt*(Float)phi[i]<<"\n";
-// 	  prop += (Float)p.N_latt*(Float)phi[i]*(Float)p.N_latt*(Float)phi1[i]*(Float)p.N_latt*(Float)phi2[i]*(Float)p.N_latt*(Float)phi3[i];  
-// 	}
-//       */
+  //       /*
+  //       for(int i=0; i<TotNumber-4; i++)
+  // 	{
+  // 	  cout<<"in prop loop"<<"\n";
+  // 	  cout<<(Float)p.N_latt*(Float)phi[i]<<"\n";
+  // 	  prop += (Float)p.N_latt*(Float)phi[i]*(Float)p.N_latt*(Float)phi1[i]*(Float)p.N_latt*(Float)phi2[i]*(Float)p.N_latt*(Float)phi3[i];  
+  // 	}
+  //       */
   
   
-//       //fourpt_info[count] = Amp4;
-//       fourpt_num[count] = src_pos3;
-//       count++;
+  //       //fourpt_info[count] = Amp4;
+  //       fourpt_num[count] = src_pos3;
+  //       count++;
 
-//       delete[] prop;
-//       delete[] prop1;
-//       delete[] prop2;
-//       delete[] prop3;
-//       delete[] phi;
-//       delete[] phi1; 
-//       delete[] phi2; 
-//       delete[] phi3;
-//       delete[] b;
-//       delete[] b1; 
-//       delete[] b2; 
-//       delete[] b3; 
-//     }
+  //       delete[] prop;
+  //       delete[] prop1;
+  //       delete[] prop2;
+  //       delete[] prop3;
+  //       delete[] phi;
+  //       delete[] phi1; 
+  //       delete[] phi2; 
+  //       delete[] phi3;
+  //       delete[] b;
+  //       delete[] b1; 
+  //       delete[] b2; 
+  //       delete[] b3; 
+  //     }
   
-//   //End of 4-pt contact term
+  //   //End of 4-pt contact term
 
-//   cout<<"LOOK HERE: "<<d12(NodeList[0].z, NodeList[1].z)<<"\n";
+  //   cout<<"LOOK HERE: "<<d12(NodeList[0].z, NodeList[1].z)<<"\n";
 
-//   /*
-//   int n_shift = p.n_shift;
-//   cout<<"n_shift is: "<<n_shift<<"\n";
-//   Float** phi_ms = new Float*[n_shift];
-//   for(int i=0; i<n_shift; i++) {
-//     phi_ms[i] = new long double[TotNumber];
-//     for(int j=0; j<TotNumber; j++) phi_ms[i][j] = 0.0;
-//   }
-//   */
-//   cout<<"outer_configs is: "<<outer_configs<<"\n";
+  //   /*
+  //   int n_shift = p.n_shift;
+  //   cout<<"n_shift is: "<<n_shift<<"\n";
+  //   Float** phi_ms = new Float*[n_shift];
+  //   for(int i=0; i<n_shift; i++) {
+  //     phi_ms[i] = new long double[TotNumber];
+  //     for(int j=0; j<TotNumber; j++) phi_ms[i][j] = 0.0;
+  //   }
+  //   */
+  //   cout<<"outer_configs is: "<<outer_configs<<"\n";
 
   
-//   ofstream myfile;
-//   myfile.open ("Amp4_HB_"+std::to_string(iteration)+".dat");
-//   for(int i=0; i<outer_configs; i++) 
-//     {
-//       myfile<<u_array[i]<<" "<<Amp_array[i]<<" "<<Amp_ana[i]<<" "<<src_pos3_array[i]<<" "<<Amp_pos_array[i]<<"\n";
-//     }
-//   myfile.close();
+  //   ofstream myfile;
+  //   myfile.open ("Amp4_HB_"+std::to_string(iteration)+".dat");
+  //   for(int i=0; i<outer_configs; i++) 
+  //     {
+  //       myfile<<u_array[i]<<" "<<Amp_array[i]<<" "<<Amp_ana[i]<<" "<<src_pos3_array[i]<<" "<<Amp_pos_array[i]<<"\n";
+  //     }
+  //   myfile.close();
  
 
 
 
   //Solve lhs = A^(-1) rhs using multishift CG 
   /*
-  Float minbdryradius = GetMinBoundaryRadius(NodeList,p);
-  Float maxbdryradius = GetMaxBoundaryRadius(NodeList,p);
-  cout<<"Minimum boundary radius is: "<<minbdryradius<<"\n";
-  cout<<"Maximum boundary radius is: "<<maxbdryradius<<"\n";
+    Float minbdryradius = GetMinBoundaryRadius(NodeList,p);
+    Float maxbdryradius = GetMaxBoundaryRadius(NodeList,p);
+    cout<<"Minimum boundary radius is: "<<minbdryradius<<"\n";
+    cout<<"Maximum boundary radius is: "<<maxbdryradius<<"\n";
   */
 
   /*
-  ofstream myfile1;
-  myfile1.open ("phirad_heatbath"+std::to_string(iteration)+".dat");
-  complex<long double> one(1,0);
-  for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
+    ofstream myfile1;
+    myfile1.open ("phirad_heatbath"+std::to_string(iteration)+".dat");
+    complex<long double> one(1,0);
+    for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile1<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile1<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile1.close();
+    myfile1.close();
     
-  //1 geo dist b/t center and bdry point
-  //2 |1-z*zb|/|(1+z)*(1+zb)|
-  //3 phirad[i]
-  //4 phirad1_array[i-endNode(p.Levels-1,p)-1]
-  //5 i
-  //6 |z|
-  //7 theta 
-  //8 |1-r^2|/(1+r^2-2*r*Cos[theta])
-  //9 1/(1+r)
-  //10
+    //1 geo dist b/t center and bdry point
+    //2 |1-z*zb|/|(1+z)*(1+zb)|
+    //3 phirad[i]
+    //4 phirad1_array[i-endNode(p.Levels-1,p)-1]
+    //5 i
+    //6 |z|
+    //7 theta 
+    //8 |1-r^2|/(1+r^2-2*r*Cos[theta])
+    //9 1/(1+r)
+    //10
 
-  delete[] phirad1_array;
+    delete[] phirad1_array;
 
   */
 
   /*
-  ofstream myfile2;
-  myfile2.open("phibdry_heatbath"+std::to_string(iteration)+".dat");
-  for(int i=endNode(p.Levels-1,p)+1; i<endNode(p.Levels,p)+1; i++)
+    ofstream myfile2;
+    myfile2.open("phibdry_heatbath"+std::to_string(iteration)+".dat");
+    for(int i=endNode(p.Levels-1,p)+1; i<endNode(p.Levels,p)+1; i++)
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
-      long double theta = atan2(ratio.imag(), ratio.real());
-      myfile2<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<phibdry[i]<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<NodeList[i].z.real()<<" "
-	     <<NodeList[i].z.imag()<<" "
-	     <<NodeList[p.src_pos].z.real()<<" "
-	     <<NodeList[p.src_pos].z.imag()<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
+    long double theta = atan2(ratio.imag(), ratio.real());
+    myfile2<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
+    <<theta<<" "
+    <<phibdry[i]<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<NodeList[i].z.real()<<" "
+    <<NodeList[i].z.imag()<<" "
+    <<NodeList[p.src_pos].z.real()<<" "
+    <<NodeList[p.src_pos].z.imag()<<"\n";
     }
-  myfile2.close();
+    myfile2.close();
   
-  delete[] phibdry;
-  //1 geodesic distance
-  //2 theta
-  //3 lattice bound-bound prop
-  //4 |z|
-  //5 Re[z]
-  //6 Im[z]
+    delete[] phibdry;
+    //1 geodesic distance
+    //2 theta
+    //3 lattice bound-bound prop
+    //4 |z|
+    //5 Re[z]
+    //6 Im[z]
 
-  */
+    */
 
   //}
 
@@ -631,174 +628,174 @@ int main(int argc, char **argv)
   //Write file of Phi[X] vs d12(Phi[X], Source[src_pos]), X on boundary
   /*
   
-  ofstream myfile1;
-  myfile1.open ("phirad_Lvl6_Lvl9.dat");
-  complex<long double> one(1,0);
-  for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
+    ofstream myfile1;
+    myfile1.open ("phirad_Lvl6_Lvl9.dat");
+    complex<long double> one(1,0);
+    for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile1<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile1<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile1.close();
+    myfile1.close();
     
-  //1 geo dist b/t center and bdry point
-  //2 |1-z*zb|/|(1+z)*(1+zb)|
-  //3 phirad[i]
-  //4 phirad1_array[i-endNode(p.Levels-1,p)-1]
-  //5 i
-  //6 |z|
-  //7 theta 
-  //8 |1-r^2|/(1+r^2-2*r*Cos[theta])
-  //9 1/(1+r)
-  //10
+    //1 geo dist b/t center and bdry point
+    //2 |1-z*zb|/|(1+z)*(1+zb)|
+    //3 phirad[i]
+    //4 phirad1_array[i-endNode(p.Levels-1,p)-1]
+    //5 i
+    //6 |z|
+    //7 theta 
+    //8 |1-r^2|/(1+r^2-2*r*Cos[theta])
+    //9 1/(1+r)
+    //10
 
   
-  ofstream myfile2;
-  myfile2.open ("phirad_Lvl5_Lvl9.dat");
-  //complex<long double> one(1,0);
-  for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
+    ofstream myfile2;
+    myfile2.open ("phirad_Lvl5_Lvl9.dat");
+    //complex<long double> one(1,0);
+    for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile2<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile2<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile2.close();
+    myfile2.close();
   
   
-  ofstream myfile3;
-  myfile3.open ("phirad_Lvl6_Lvl9.dat");
-  //complex<long double> one(1,0);
-  for(int i=endNode(6,p)+1; i<endNode(7,p)+1; i++) 
+    ofstream myfile3;
+    myfile3.open ("phirad_Lvl6_Lvl9.dat");
+    //complex<long double> one(1,0);
+    for(int i=endNode(6,p)+1; i<endNode(7,p)+1; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile3<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile3<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile3.close();
+    myfile3.close();
 
 
-  ofstream myfile4;
-  myfile4.open ("phirad_Lvl7_Lvl9.dat");
-  //complex<long double> one(1,0);
-  for(int i=endNode(7,p)+1; i<endNode(8,p)+1; i++) 
+    ofstream myfile4;
+    myfile4.open ("phirad_Lvl7_Lvl9.dat");
+    //complex<long double> one(1,0);
+    for(int i=endNode(7,p)+1; i<endNode(8,p)+1; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile4<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile4<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile4.close();
+    myfile4.close();
   
 
-  ofstream myfile5;
-  myfile5.open ("phirad_Lvl8_Lvl9.dat");
-  //complex<long double> one(1,0);
-  for(int i=endNode(8,p)+1; i<TotNumber; i++) 
+    ofstream myfile5;
+    myfile5.open ("phirad_Lvl8_Lvl9.dat");
+    //complex<long double> one(1,0);
+    for(int i=endNode(8,p)+1; i<TotNumber; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile5<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile5<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile5.close();
+    myfile5.close();
   
 
-  ofstream myfile6;
-  myfile6.open ("phirad_Lvl9_Lvl9.dat");
-  //complex<long double> one(1,0);
-  for(int i=endNode(9,p)+1; i<TotNumber; i++) 
+    ofstream myfile6;
+    myfile6.open ("phirad_Lvl9_Lvl9.dat");
+    //complex<long double> one(1,0);
+    for(int i=endNode(9,p)+1; i<TotNumber; i++) 
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[0].z;
-      long double theta = atan2( ratio.imag(), ratio.real());
-      //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
-      myfile5<<d12(NodeList[0].z, NodeList[i].z)<<" "
-	     <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
-		   /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
-	     <<phirad[i]<<" "
-	     <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
-	     <<i<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
-	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[0].z;
+    long double theta = atan2( ratio.imag(), ratio.real());
+    //cout<<"i is: "<<i<<"and "<<i-endNode(p.Levels-1,p)-1<<"\n";
+    myfile5<<d12(NodeList[0].z, NodeList[i].z)<<" "
+    <<abs((one-(NodeList[i].z)*conj(NodeList[i].z))
+    /((one+NodeList[i].z)*(one+conj(NodeList[i].z))))<<" "
+    <<phirad[i]<<" "
+    <<phirad1_array[i-endNode(p.Levels-1,p)-1]<<" "
+    <<i<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<theta<<" "
+    <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
+    /(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
+    " "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
     }   
-  myfile6.close();
- */
+    myfile6.close();
+  */
   
 
   /*
 
-  ofstream myfile2;
-  myfile2.open("phibdry_Lvl6_Lvl9.dat");
-  for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++)
+    ofstream myfile2;
+    myfile2.open("phibdry_Lvl6_Lvl9.dat");
+    for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++)
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
-      long double theta = atan2(ratio.imag(), ratio.real());
-      myfile2<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<phibdry[i]<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<NodeList[i].z.real()<<" "
-	     <<NodeList[i].z.imag()<<" "
-	     <<NodeList[p.src_pos].z.real()<<" "
-	     <<NodeList[p.src_pos].z.imag()<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
+    long double theta = atan2(ratio.imag(), ratio.real());
+    myfile2<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
+    <<theta<<" "
+    <<phibdry[i]<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<NodeList[i].z.real()<<" "
+    <<NodeList[i].z.imag()<<" "
+    <<NodeList[p.src_pos].z.real()<<" "
+    <<NodeList[p.src_pos].z.imag()<<"\n";
     }
-  myfile2.close();
+    myfile2.close();
   */
   //1 geodesic distance
   //2 theta
@@ -808,23 +805,23 @@ int main(int argc, char **argv)
   //6 Im[z]
   
   /*
-  cout<<"before phibdry_Lvl9.dat"<<"\n";
-  ofstream myfile9;
-  myfile9.open("phibdry_Lvl9.dat");
-  for(int i=endNode(8,p)+1; i<TotNumber; i++)
+    cout<<"before phibdry_Lvl9.dat"<<"\n";
+    ofstream myfile9;
+    myfile9.open("phibdry_Lvl9.dat");
+    for(int i=endNode(8,p)+1; i<TotNumber; i++)
     {
-      complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
-      long double theta = atan2(ratio.imag(), ratio.real());
-      myfile9<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
-	     <<theta<<" "
-	     <<phibdry[i]<<" "
-	     <<abs(NodeList[i].z)<<" "
-	     <<NodeList[i].z.real()<<" "
-	     <<NodeList[i].z.imag()<<" "
-	     <<NodeList[p.src_pos].z.real()<<" "
-	     <<NodeList[p.src_pos].z.imag()<<"\n";
+    complex<long double> ratio = NodeList[i].z/NodeList[p.src_pos].z;
+    long double theta = atan2(ratio.imag(), ratio.real());
+    myfile9<<d12(NodeList[p.src_pos].z, NodeList[i].z)<<" "
+    <<theta<<" "
+    <<phibdry[i]<<" "
+    <<abs(NodeList[i].z)<<" "
+    <<NodeList[i].z.real()<<" "
+    <<NodeList[i].z.imag()<<" "
+    <<NodeList[p.src_pos].z.real()<<" "
+    <<NodeList[p.src_pos].z.imag()<<"\n";
     }
-  myfile9.close();
+    myfile9.close();
   */
   //1 geodesic distance
   //2 theta
@@ -840,10 +837,10 @@ int main(int argc, char **argv)
   //delete[] phirad;
   //delete[] brad;
 
-  #endif
+#endif
 
-
-
+  
+  
   return 0;
 }
 
