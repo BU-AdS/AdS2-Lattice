@@ -15,11 +15,10 @@ VERBOSITY='q'
 Q=7
 MAX_ITER=100000
 TOL=1e-8
-TIMESLICES=1
-MSQR=0.2
+MSQR=1.0
 LEVELS=$1
 SRC_POS=-1
-g_MSQR=2.0
+g_MSQR=1.0
 g_LATT=1.0
 LAMBDA=0.0
 SCALE=1.0
@@ -28,8 +27,8 @@ N_SHIFT=1
 make
 
 COMMAND="./spectrum ${BC} ${CENTRE} ${VERBOSITY} \
-	 	  ${MAX_ITER} ${TOL} ${TIMESLICES} ${MSQR} ${LAMBDA} \
-	 	  ${LEVELS} ${SRC_POS} ${g_MSQR} ${g_LATT} ${Q} ${N_SHIFT}"
+	 	    ${MAX_ITER} ${TOL} ${MSQR} ${LAMBDA} \
+	 	    ${LEVELS} ${SRC_POS} ${g_MSQR} ${g_LATT} ${Q} ${N_SHIFT}"
 
 echo ${COMMAND}
 

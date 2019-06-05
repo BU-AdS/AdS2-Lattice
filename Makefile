@@ -3,7 +3,7 @@
 #============================================================
 
 #Your path to Eigen
-EIGEN=/Users/hattrick/Desktop/Projects/Lattice_AdS/C-program/Eigen
+EIGEN=/Users/deanhowarth/Eigen
 
 TARGET	    = spectrum
 C_SOURCES   = ads_graph.cpp 

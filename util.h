@@ -23,17 +23,15 @@ class Param{
   int n_shift = 100;
   Float tol = pow(10,-6);
   int t = 1;
-  Float msqr = 0.1;
+  Float msqr = 1.0;
   Float lambda = 0.0;
-  Float C_msqr = 1.0;
+  Float C_msqr = 4.0;
   Float N_latt = 1.0;
-  int Levels = 3;
+  int Levels = 6;
   int src_pos = -1;
   Float DiskScale = 1.0;
   char fname[256];
 
-  int Lt = 2;
-  //int Lt = 32;
   int S1 = 32;
   int SurfaceVol = 0;
   int AdSVol = 0;
@@ -80,7 +78,7 @@ class Param{
   
   void init(int argc, char **argv) 
   { 
-
+    cout<<"FLAG"<<endl;
     std::string BC(argv[1]);
     if (BC == "D" || BC == "d") 
 	bc = true;
@@ -91,7 +89,7 @@ class Param{
 	cout<<"Invalid boundary condition given. Use D/d for Dirichlet or N/n for Neumann."<<endl;
 	exit(0);
       }
-    
+    cout<<"FLAG"<<endl;
     std::string Centre(argv[2]);
     if (Centre == "V" || Centre == "v") 
       Vcentre = true;
@@ -102,7 +100,7 @@ class Param{
 	cout<<"Invalid centre condition given. Use V/v for Vertexcentred or C/c for Circumcentred."<<endl;
 	exit(0);
       }
-
+    cout<<"FLAG"<<endl;
     std::string verbose(argv[3]);
     if (verbose == "V" || verbose == "v") 
 	verbosity = true;
@@ -113,26 +111,25 @@ class Param{
 	cout<<"Invalid Verbosity conditions given. Use verbose/quiet"<<endl;
 	exit(0);
       }
-
+    cout<<"FLAG"<<endl;
     MaxIter = atoi(argv[4]);
     tol     = atof(argv[5]);
-    t       = atoi(argv[6]);    
-    msqr    = atof(argv[7]);
-    lambda  = atof(argv[8]);
-    Levels  = atoi(argv[9]);
-    src_pos = atoi(argv[10]);
-    
+    msqr    = atof(argv[6]);
+    lambda  = atof(argv[7]);
+    Levels  = atoi(argv[8]);
+    src_pos = atoi(argv[9]);
+    cout<<"FLAG"<<endl;
     //if(atof(argv[11]) == 0) C_msqr = -0.0126762/msqr + 0.0689398*msqr + 2.02509;
-    if(atof(argv[11]) == 0) C_msqr = -0.0126762/msqr + 0.0689398*msqr + 2.02509;
-    else C_msqr = atof(argv[11]);
-    
+    if(atof(argv[10]) == 0) C_msqr = -0.0126762/msqr + 0.0689398*msqr + 2.02509;
+    else C_msqr = atof(argv[10]);
+    cout<<"FLAG"<<endl;
     //if(atof(argv[12]) == 0) N_latt = 0.294452/(msqr + 0.766901) + 0.0788137;
-    if(atof(argv[12]) == 0) N_latt = 0.294452/(msqr + 0.766901) + 0.0788137;
-    else N_latt = atof(argv[12]);
-    
-    q = atoi(argv[13]);
-    n_shift = atoi(argv[14]);
-    
+    if(atof(argv[11]) == 0) N_latt = 0.294452/(msqr + 0.766901) + 0.0788137;
+    else N_latt = atof(argv[11]);
+    cout<<"FLAG"<<endl;
+    q = atoi(argv[12]);
+    n_shift = atoi(argv[13]);
+    cout<<"FLAG END"<<endl;
   }
 };
 
@@ -721,7 +718,7 @@ Float sigma(complex<Float> z, complex<Float> w, int delta_t) {
   Float xi = (cosh(delta_t)*(1+r)*(1+r_p) - 4*r*r_p*cos(theta)) / ((1-r)*(1-r_p)); 
   
   return acosh(xi);
-    
+  
 }
 
 // length of arc q fold triangle to origin.

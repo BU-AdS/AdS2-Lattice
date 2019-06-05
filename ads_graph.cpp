@@ -28,10 +28,9 @@ int main(int argc, char **argv)
   Param p;    
   if(argc > 1) p.init(argc, argv);   
 
-  
   p.S1 = endNode(p.Levels,p) + 1 - (endNode(p.Levels-1,p) + 1);
-  p.SurfaceVol = p.S1*p.Lt;
-  p.AdSVol = (endNode(p.Levels,p) + 1)*p.t;
+  p.SurfaceVol = p.S1;
+  p.AdSVol = (endNode(p.Levels,p) + 1);
   p.latVol = p.AdSVol;
   
   //Print parameters
@@ -62,9 +61,6 @@ int main(int argc, char **argv)
   int src_pos2 = src_array[1];
   int src_pos3 = src_array[2];
   int src_pos4 = src_array[3];
-
-  //Print paramters
-  p.print();
 
   //Print graph endnode info
   //for(int i=1; i<20; i++) cout<<"Endnode("<<i<<") = "<<endNode(i,p)<<endl;

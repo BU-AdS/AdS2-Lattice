@@ -8,7 +8,7 @@
 using namespace std;
 
 int Mphi(Float *phi, const Float *phi0,
-	 const vector<Vertex> NodeList, Param P) {
+	 const vector<Vertex> NodeList, Param &P) {
 
   int Levels = P.Levels;
   int q = P.q;
@@ -97,7 +97,7 @@ int Mphi(Float *phi, const Float *phi0,
 
 
 Float Minv_phi(Float *phi, Float *b,
-	       const vector<Vertex> NodeList, Param P) {
+	       const vector<Vertex> NodeList, Param &P) {
   // CG solutions to Mphi = b 
   //  see http://en.wikipedia.org/wiki/Conjugate_gradient_method
   int Levels = P.Levels;
@@ -188,69 +188,58 @@ Float Minv_phi(Float *phi, Float *b,
 }
 
 
-void latticeScaling(const vector<Vertex> NodeList, Param p)
+void latticeScaling(const vector<Vertex> NodeList, Param &p)
 {
   cout<<"In!"<<"\n";
   int latVol  = p.latVol;
   int lower = endNode(p.Levels-1,p)+1;
-  long unsigned int TotNumber = (endNode(p.Levels,p) + 1) * p.t;
+  long unsigned int TotNumber = (endNode(p.Levels,p) + 1);
   int outer_cirum = endNode(p.Levels,p)-endNode(p.Levels-1,p);
 
-  int t1, t2, delta_t;
+  int t1, t2;
   double delta = 1.0 + sqrt(1 + p.msqr);
   double theta, r, r_p;
   complex<double> ratio;
   complex<double> snk;
-  double* analytic_prop = new double[outer_cirum*p.Lt/2];
-  double* xi_invariant  = new double[outer_cirum*p.Lt/2];
+  double* analytic_prop = new double[outer_cirum/2];
+  double* xi_invariant  = new double[outer_cirum/2];
 
  
   // Construct the xi invariant and the analytic propagator
   
   int j = lower;
   complex<Float> src = NodeList[j].z;
-  //Loop over timeslices
-  for(int t=0; t<p.Lt/2; t++) {
-    cout<<"t is: "<<t<<"\n";
-    int T_offset = (endNode(p.Levels,p) + 1) * t;
-
-    //Loop over outer circle of the Poincare disk
-    for(long unsigned int k = 0; k < outer_cirum; k++) {
-
-      //Construct i (full lattice index)
-      int i = T_offset + lower + k;
-      //Construct s (surface lattice index)
-      int s = t*outer_cirum + k;
-      
-      ratio = NodeList[i].z/NodeList[j].z;
-      theta = atan2( ratio.imag() , ratio.real() );
-      //index divided by disk size, using the int floor feature/bug,
-      //gives the timeslice for each index.
-      int t1 = j / (TotNumber/p.t);
-      int t2 = i / (TotNumber/p.t);
-      cout<<"i is: "<<i<<"\n";
-      //Assume PBC.
-      int delta_t = (t2-t1);
-      complex<Float> snk = NodeList[i].z;
-      Float r   = abs(NodeList[i].z);
-      Float r_p = abs(NodeList[j].z);
-      
-      xi_invariant[s]  = log( ((1-r)*(1-r_p))/(cosh(delta_t)*(1+r)*(1+r_p)
-					       - 4*r*r_p*cos(theta)) );
-      
-      analytic_prop[s] = log( exp(-delta*sigma(src,snk,delta_t)) /
-			      (1 - exp(-2*sigma(src,snk,delta_t))));
-      
-      //if(s<10) cout<<"s="<<s<<" xi="<<xi_invariant[s]<<" ap="<<analytic_prop[s]<<endl;
-    }
+  //Loop over outer circle of the Poincare disk
+  for(long unsigned int k = 0; k < outer_cirum; k++) {
+    
+    //Construct i (full lattice index)
+    int i = lower + k;
+    //Construct s (surface lattice index)
+    int s = k;
+    
+    ratio = NodeList[i].z/NodeList[j].z;
+    theta = atan2( ratio.imag() , ratio.real() );
+    
+    complex<Float> snk = NodeList[i].z;
+    Float r   = abs(NodeList[i].z);
+    Float r_p = abs(NodeList[j].z);
+    
+    xi_invariant[s]  = log( ((1-r)*(1-r_p))/((1+r)*(1+r_p)
+					     - 4*r*r_p*cos(theta)) );
+    
+    analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) /
+			    (1 - exp(-2*sigma(src,snk,0))));
+    
+    //if(s<10) cout<<"s="<<s<<" xi="<<xi_invariant[s]<<" ap="<<analytic_prop[s]<<endl;
   }
+  
   
   cout<<"xi invariant is "<<xi_invariant[10]<<"\n";
   double* c = new double[2];
   double* cov_ssq = new double[4];
-  gsl_fit_linear(xi_invariant, 1, analytic_prop, 1, outer_cirum*p.Lt/2, &c[0], &c[1],
-  	 &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
-
+  gsl_fit_linear(xi_invariant, 1, analytic_prop, 1, outer_cirum/2, &c[0], &c[1],
+		 &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
+  
   cout<<"Target data"<<endl;
   cout<<"GSL data: C="<<c[0]<<" M="<<c[1]<<endl;
   cout<<"          covar00 = "<<cov_ssq[0]<<endl;
@@ -269,7 +258,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   ifstream fileInput;
   string line;
   char params[256];
-  sprintf(params, "%d %d %d %.4f", p.q, p.Levels, p.Lt, p.msqr);
+  sprintf(params, "%d %d %.4f", p.q, p.Levels, p.msqr);
   char* search = params;
   unsigned int curLine = 0;
   // open file to search
@@ -329,24 +318,21 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
     //prop (w.r.t the xi invariant) to compute the relevant
     //scaling and normalsation.
     
-    double* latt_prop  = new double[outer_cirum*p.Lt/2];
-    //Loop over timeslices
-    for(int t=0; t<p.Lt/2; t++) {
-      int T_offset = (endNode(p.Levels,p) + 1) * t;
-      //Loop over H2 disk
-      for(long unsigned int k = 0; k < outer_cirum; k++) {
-	
-	//Construct i (full lattice AdS2p1 index)
-	int i = T_offset + lower + k;
-	//Construct s (surface lattice 2D index)
-	int s = t*outer_cirum + k;
-	
-	latt_prop[s] = phi_ave[i];
-      }
+    double* latt_prop  = new double[outer_cirum/2];
+
+    //Loop over H2 disk
+    for(long unsigned int k = 0; k < outer_cirum; k++) {
+      
+      //Construct i (full lattice AdS2p1 index)
+      int i = lower + k;
+      //Construct s (surface lattice 2D index)
+      int s = k;
+      
+      latt_prop[s] = phi_ave[i];
     }
-  
+    
     //Extract linear fit data from log-log plot.
-    gsl_fit_linear(xi_invariant, 1, latt_prop, 1, outer_cirum*p.Lt/2, &c[0], &c[1],
+    gsl_fit_linear(xi_invariant, 1, latt_prop, 1, outer_cirum/2, &c[0], &c[1],
 		   &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
     
     cout<<"At iteration "<<iter<<endl;
@@ -388,8 +374,8 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   //If this is a new problem, and it tuned properly, save the data.
   if(!preTuned && tuneWin) {
     FILE *file = fopen("ads_wisdom", "a");
-    fprintf(file,"%d %d %d %.4f\n%f\n%f\n",
-	    p.q, p.Levels, p.Lt, p.msqr,
+    fprintf(file,"%d %d %.4f\n%f\n%f\n",
+	    p.q, p.Levels, p.msqr,
 	    p.N_latt,
 	    p.C_msqr);
     fclose(file);
@@ -397,7 +383,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
 
   delete[] c;
   delete[] cov_ssq;
-
+  
   delete[] analytic_prop;
   delete[] xi_invariant;
 }

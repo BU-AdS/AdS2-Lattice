@@ -13,8 +13,6 @@ void BuildGraph(Graph &NodeList, Param P){
 
   int q = P.q;
   int Levels = P.Levels;
-  int T = P.t;
-  int offset = endNode(Levels,P) + 1;
   
   if(P.Vcentre == true) {
 
@@ -107,38 +105,6 @@ void BuildGraph(Graph &NodeList, Param P){
 	if(n == endNode(Levels,P)) NodeList[endNode(l,P)].nn[q-3] = -1;
 	else NodeList[endNode(l,P)].nn[q-3] = endNode(l,P) + 1;
       }
-    }
-    
-    //Populate temporal links on t=0 disk
-    for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-      //Fwd link
-      NodeList[n].nn[q  ] = n + offset;
-      //Bkd link
-      NodeList[n].nn[q+1] = (T-1)*offset + n;
-    }
-    
-    //Construct disks and t links for 0 < t < T
-    for(int t=1; t<T; t++)
-      for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-	for(int i=0; i<q; i++) {
-	  NodeList[(t-1)*offset + n].nn[i] == -1 ?
-	    NodeList[t*offset + n].nn[i] = -1 : 
-	    NodeList[t*offset + n].nn[i] =
-	    NodeList[(t-1)*offset + n].nn[i] + offset;
-	}
-	//Fwd link
-	NodeList[t*offset + n].nn[q  ] = (t+1)*offset + n;    
-	//Bkd link
-	NodeList[t*offset + n].nn[q+1] = (t-1)*offset + n;
-	//fwdLinks data
-	NodeList[t*offset + n].fwdLinks = NodeList[n].fwdLinks;
-      }
-    
-    
-    //Correct forward t links for t = T-1
-    int t=T-1;
-    for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-      NodeList[t*offset + n].nn[q] = n;
     }
   }
   else {  
@@ -261,39 +227,6 @@ void BuildGraph(Graph &NodeList, Param P){
 	else NodeList[endNode(l,P)].nn[q-3] = endNode(l,P) + 1;
       }
     }
-    
-    //Populate temporal links on t=0 disk
-    for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-      //Fwd link
-      NodeList[n].nn[q  ] = n + offset;
-      //Bkd link
-      NodeList[n].nn[q+1] = (T-1)*offset + n;
-    }
-    
-    //Construct disks and t links for 0 < t < T
-    for(int t=1; t<T; t++)
-      for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-	for(int i=0; i<q; i++) {
-	  NodeList[(t-1)*offset + n].nn[i] == -1 ?
-	    NodeList[t*offset + n].nn[i] = -1 : 
-	    NodeList[t*offset + n].nn[i] =
-	    NodeList[(t-1)*offset + n].nn[i] + offset;
-	}
-	//Fwd link
-	NodeList[t*offset + n].nn[q  ] = (t+1)*offset + n;    
-	//Bkd link
-	NodeList[t*offset + n].nn[q+1] = (t-1)*offset + n;
-	//fwdLinks data
-	NodeList[t*offset + n].fwdLinks = NodeList[n].fwdLinks;
-      }
-    
-    //Correct forward t links for t = T-1
-    int t=T-1;
-    for(long unsigned int n=0; n<endNode(Levels,P)+1; n++) {
-      NodeList[t*offset + n].nn[q] = n;
-    }
-  }
-    
+  }    
 }
-
 #endif
