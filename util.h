@@ -54,7 +54,7 @@ class Param{
   double dt = 0.1;
   double delta_phi = 1.5;
 
-  
+  int t=1;
   
   void print()
   {

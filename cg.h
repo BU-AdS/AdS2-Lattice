@@ -173,8 +173,8 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   int outer_cirum = endNode(p.Levels,p)-endNode(p.Levels-1,p);
 
   int t1, t2;
-  //double delta = 1.0 + sqrt(1 + p.msqr);     // d=2
-  double delta = 0.5 + sqrt(0.25 + p.msqr);     // d=1
+  double delta = 1.0 + sqrt(1 + p.msqr);     // d=2
+  //double delta = 0.5 + sqrt(0.25 + p.msqr);     // d=1
   double theta, r, r_p;
   complex<double> ratio;
   complex<double> snk;
@@ -203,9 +203,9 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
       
       xi_invariant[s]  = log( ((1-r)*(1-r_p))/((1+r)*(1+r_p)- 4*r*r_p*cos(theta)) );
           
-      analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) /
-			      pow(1 - exp(-2*sigma(src,snk,0)),delta));
-      
+      //analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) / pow(1 - exp(-2*sigma(src,snk,0)),delta));
+      analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) / (1 - exp(-2*sigma(src,snk,0))));
+
       //if(s<10) cout<<"s="<<s<<" xi="<<xi_invariant[s]<<" ap="<<analytic_prop[s]<<endl;
     }
   
