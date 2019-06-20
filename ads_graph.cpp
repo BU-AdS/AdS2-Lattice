@@ -115,7 +115,15 @@ int main(int argc, char **argv)
     }
   
 #if 1
+
+
   
+  // Lattice Scaling
+  latticeScaling(NodeList, p);   
+
+
+
+
   /******************************/
 
   //   for(int iteration=0; iteration < 1; iteration++){
@@ -251,6 +259,69 @@ int main(int argc, char **argv)
   cout<<"After boundary-boundary before radial boundary"<<"\n";
   */
   
+
+//   // ******Laplacian ***********************
+//   Float* philap = new Float[TotNumber];
+//   Float* blap = new Float[TotNumber];
+//   Float** M = new Float*[TotNumber];
+//   Float** geo = new Float*[TotNumber];
+//   for(int n=0; n<TotNumber; n++)
+//     {
+//       M[n] = new Float[TotNumber];
+//       geo[n] = new Float[TotNumber];
+//     }
+//   for(int i=0; i<TotNumber; i++)
+//     {
+//       philap[i] = 0.0;
+//       blap[i] = 0.0;
+//     }
+//   for(int i=0; i<TotNumber; i++)
+//     {
+//       blap[i] = 1.0;
+//       Minv_phi(philap, blap, NodeList, p);
+//       for(int j=0; j<TotNumber; j++)
+// 	{
+// 	  //if(i != j)
+// 	  //{
+// 	  //Minv_phi(philap, blap, NodeList, p);
+// 	      geo[i][j] = d12(NodeList[i].z, NodeList[j].z);
+// 	      M[j][i] = philap[j];
+// 	      //}
+// 	}
+//       blap[i] = 0.0;
+//     }
+
+
+//   ofstream wavefiles;
+//   wavefiles.open("lap_matrix.dat");
+//   for(int i=0; i<p.latVol; i++)
+//     {
+//       for(int j=0; j<p.latVol; j++)
+// 	{
+// 	 wavefiles<<M[i][j]<<" ";
+// 	}
+//       wavefiles<<"\n";
+//     }
+//   wavefiles.close();
+
+
+//   ofstream geofiles;
+//   geofiles.open("geo_matrix.dat");
+//   for(int i=0; i<p.latVol; i++)
+//     {
+//       for(int j=0; j<p.latVol; j++)
+// 	{
+// 	  geofiles<<geo[i][j]<<" ";
+// 	}
+//       geofiles<<"\n";
+//     }
+//   geofiles.close();
+    
+  
+//   //**********End Laplacian ***********************
+
+
+
   //Radial Bulk-Bdry: characterize as a function of theta
   
   Float* phirad = new Float[TotNumber];
@@ -264,7 +335,7 @@ int main(int argc, char **argv)
   brad[0] = 1.0;
   Float truesq = 0.0;
   truesq = Minv_phi(phirad, brad, NodeList, p);
-  Bulk2Bdry(NodeList, phirad, p);
+  //Bulk2Bdry(NodeList, phirad, p);
   
   int outer_num = endNode(p.Levels,p)-endNode(p.Levels-1,p)+1;
   Float* phirad1_array = new Float[outer_num];
@@ -292,13 +363,13 @@ int main(int argc, char **argv)
     //cout<<"At number "<<j<<" out of "<<outer_num<<"\n";
     }
   */
-  delete[] phirad;
+  
   
   ofstream myfile1;
   myfile1.open ("phirad.dat");
   complex<long double> one(1,0);
-  for(int i=0; i<TotNumber; i++)
-    //for(int i=endNode(5,p)+1; i<endNode(6,p)+1; i++) 
+  //for(int i=0; i<TotNumber; i++)
+    for(int i=endNode(p.Levels-1,p)+1; i<endNode(p.Levels,p)+1; i++) 
     {
       complex<long double> ratio = NodeList[i].z/NodeList[0].z;
       long double theta = atan2( ratio.imag(), ratio.real());
@@ -313,7 +384,7 @@ int main(int argc, char **argv)
 	     <<theta<<" "
 	     <<(abs(one)-(long double)abs(NodeList[i].z)*abs(NodeList[i].z))
 	/(abs(one)+(long double)(abs(NodeList[i].z)*abs(NodeList[i].z))-2*abs(NodeList[i].z)*cos(3.141592))<<
-	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<"\n";
+	" "<<abs(one)/(abs(one)+abs(NodeList[i].z))<<" "<<r(s(NodeList[i].z))<<"\n";
     }   
   myfile1.close();
     
@@ -326,14 +397,83 @@ int main(int argc, char **argv)
   //7 theta 
   //8 |1-r^2|/(1+r^2-2*r*Cos[theta])
   //9 1/(1+r)
-  //10
+  //10 geodesic dist from origin
  
 
 
   //cout<<"After radial bulk-bound"<<"\n";
   
 
-  latticeScaling(NodeList, p);
+  //cout<<"LATICE SCALING"<<endl;
+  //latticeScaling(NodeList, p);
+
+
+
+//   //****WAVE EQUATION****
+  
+//   Float *wave = new Float[p.AdSVol];
+//   wave = wave_eqn(NodeList, phirad, p);
+
+//   ofstream wavefile;
+//   wavefile.open("wave_eqn.dat");
+//   for(int i=0; i<p.latVol; i++)
+//     wavefile<<wave[i]<<" "<<phirad[i]<<"\n";
+//   wavefile.close();
+
+//   cout<<"After wave"<<"\n";
+
+//   int latVol = p.latVol;
+//   int lower = endNode(p.Levels-1,p)+1;
+
+//   Float* phi_ave = new Float[latVol];
+//   Float* phi = new Float[latVol];
+//   Float* b   = new Float[latVol];
+      
+//   //Take the average data from all sources (points)
+//   int sources = latVol;
+//   //int sources =  (endNode(p.Levels,p) - endNode(p.Levels-1,p));
+
+//   //initialise, invert, average
+//   for(int i=0; i<latVol; i++) 
+//     phi_ave[i] = 0.0;
+//   for(int s=0; s<sources; s++) 
+//     {
+//       for(int i=0; i<latVol; i++) 
+//         {
+//           b[i] = 0.0;
+//           phi[i] = 0.0;
+//         }
+//       b[s] = 1.0;
+//       //b[lower + s] = 1.0;
+//       Minv_phi(phi, b, NodeList, p);
+//       for(int i=0; i<latVol; i++) 
+//         phi_ave[i] += phi[i];
+//     }
+//   for(int i=0; i<latVol; i++)
+//     phi_ave[i] = 0.5 * phi_ave[i] / (latVol*sources);    // double-counted in for loops
+
+//   // phi_ave[n] is thus the average of props from all points to point n
+//   // also the same as the average value of phi moving the source around
+//   // all points
+
+
+//   // now that we have this configuration, ask what the wave eq is
+//   // to see what the lowest eigenvalue is
+//   Float *wave1 = new Float[p.AdSVol];
+//   wave1 = wave_eqn(NodeList, phi_ave, p);
+
+
+//   ofstream wavefile1;
+//   wavefile1.open("wave_eqn_1.dat");
+//   for(int i=0; i<p.latVol; i++)
+//     wavefile1<<wave1[i]<<" "<<phi_ave[i]<<"\n";
+//   wavefile1.close();
+
+
+
+//   // ***** END WAVE EQUATION ****
+
+
 
 
   //   //Four-point contact term
@@ -360,7 +500,7 @@ int main(int argc, char **argv)
   //       Float xi12 = NodeList[src_pos1].z.imag()-NodeList[src_pos2].z.imag();
   //       Float xi34 = NodeList[src_pos3].z.imag()-NodeList[src_pos4].z.imag();
   //       Float xi13 = NodeList[src_pos1].z.imag()-NodeList[src_pos3].z.imag();
-  //       Float xi24 = NodeList[src_pos2].z.imag()-NodeList[src_pos4].z.imag();
+  //       Float xi24 = NodeList[srco_pos2].z.imag()-NodeList[src_pos4].z.imag();
   //       Float u_cr = ((xr12*xr12+xi12*xi12)*(xr34*xr34+xi34*xi34))/((xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24));
   //       Float Dfunction =    (sqrt(M_PI)/(2*(xr13*xr13+xi13*xi13)*(xr24*xr24+xi24*xi24)))*((-2*log(1- sqrt(u_cr)))/(sqrt(u_cr)) + log(u_cr)/(sqrt(u_cr)-1));
 

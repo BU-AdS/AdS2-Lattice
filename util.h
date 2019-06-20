@@ -24,7 +24,7 @@ class Param{
   Float tol = pow(10,-6);
   Float msqr = 1.0;
   Float lambda = 0.0;
-  Float C_msqr = 2.0;
+  Float C_msqr = 1.0;
   Float N_latt = 1.0;
   int Levels = 6;
   int src_pos = -1;
@@ -1282,6 +1282,29 @@ void update_phi(vector<Vertex> &Lattice, Float *mom, Param p, double dt) {
   
 }
 
+Float *wave_eqn(vector<Vertex> &Lattice, Float *phirad, Param p)
+{
+  Float *lap_phi = new Float[p.AdSVol];
+  for(int i=0; i<p.AdSVol; i++)
+    lap_phi[i] = 0.0;
+  for(int i=0; i<p.AdSVol; i++)
+    {
+      for(int q=0; q<p.q; q++)
+	{
+	  //cout<<"phirad[i] is: "<<phirad[i];
+	  lap_phi[i] += phirad[Lattice[i].nn[q]] - phirad[i];
+	}
+    }
+  
+  /*
+  ofstream wavefile;
+  wavefile.open("wave_eqn1.dat");
+  for(int i=0; i<p.latVol; i++)
+    wavefile<<lap_phi[i]<<" "<<phirad[i]<<"\n";
+  wavefile.close();
+  */
+  return lap_phi;
+}
 
 
 #endif

@@ -173,7 +173,8 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   int outer_cirum = endNode(p.Levels,p)-endNode(p.Levels-1,p);
 
   int t1, t2;
-  double delta = 1.0 + sqrt(1 + p.msqr);
+  //double delta = 1.0 + sqrt(1 + p.msqr);     // d=2
+  double delta = 0.5 + sqrt(0.25 + p.msqr);     // d=1
   double theta, r, r_p;
   complex<double> ratio;
   complex<double> snk;
@@ -185,34 +186,34 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   int j = lower;
   complex<Float> src = NodeList[j].z;
   //Loop over outer circle of the Poincare disk
-  for(long unsigned int k = 0; k < outer_cirum; k++) {
+  for(long unsigned int k = 0; k < outer_cirum; k++) 
+    {
     
-    //Construct i (full lattice index)
-    int i = lower + k;
-    //Construct s (surface lattice index)
-    int s = k;
-    
-    ratio = NodeList[i].z/NodeList[j].z;
-    theta = atan2( ratio.imag() , ratio.real() );
-    
-    complex<Float> snk = NodeList[i].z;
-    Float r   = abs(NodeList[i].z);
-    Float r_p = abs(NodeList[j].z);
-    
-    xi_invariant[s]  = log( ((1-r)*(1-r_p))/((1+r)*(1+r_p)
-					     - 4*r*r_p*cos(theta)) );
-    
-    analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) /
-			    (1 - exp(-2*sigma(src,snk,0))));
-    
-    //if(s<10) cout<<"s="<<s<<" xi="<<xi_invariant[s]<<" ap="<<analytic_prop[s]<<endl;
-  }
+      //Construct i (full lattice index)
+      int i = lower + k;
+      //Construct s (surface lattice index)
+      int s = k;
+      
+      ratio = NodeList[i].z/NodeList[j].z;
+      theta = atan2( ratio.imag() , ratio.real() );
+      
+      complex<Float> snk = NodeList[i].z;
+      Float r   = abs(NodeList[i].z);
+      Float r_p = abs(NodeList[j].z);
+      
+      xi_invariant[s]  = log( ((1-r)*(1-r_p))/((1+r)*(1+r_p)- 4*r*r_p*cos(theta)) );
+          
+      analytic_prop[s] = log( exp(-delta*sigma(src,snk,0)) /
+			      pow(1 - exp(-2*sigma(src,snk,0)),delta));
+      
+      //if(s<10) cout<<"s="<<s<<" xi="<<xi_invariant[s]<<" ap="<<analytic_prop[s]<<endl;
+    }
   
   
   cout<<"xi invariant is "<<xi_invariant[10]<<"\n";
   double* c = new double[2];
   double* cov_ssq = new double[4];
-  gsl_fit_linear(xi_invariant, 1, analytic_prop, 1, outer_cirum/2, &c[0], &c[1],
+  gsl_fit_linear(xi_invariant, 1, analytic_prop, 1, outer_cirum /* /2 */, &c[0], &c[1],
 		 &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
   
   cout<<"Target data"<<endl;
@@ -225,7 +226,7 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   double grad = c[1];
   double d_grad = 100;
 
-  double grad_tol = 1e-4;
+  double grad_tol = 1e-6;
 
   //Search in wisdom file for a shorcut
   bool preTuned = false;
@@ -238,113 +239,125 @@ void latticeScaling(const vector<Vertex> NodeList, Param p)
   unsigned int curLine = 0;
   // open file to search
   fileInput.open("ads_wisdom");
-  if(fileInput.is_open()) {
-    while(getline(fileInput, line)) {
-      curLine++;
-      if (line.find(search, 0) != string::npos) {
-	cout<<"Found data for your problem! Lucky you..."<<endl;
-	preTuned = true;
-	getline(fileInput, line);
-	p.N_latt = stof(line);
-	getline(fileInput, line);
-	p.C_msqr = stof(line);
-	cout<<"Using N_latt="<<p.N_latt<<endl;
-	cout<<"Using C_msqr="<<p.C_msqr<<endl;
-	fileInput.close();
-      }
+  if(fileInput.is_open()) 
+    {
+      while(getline(fileInput, line)) 
+	{
+	  curLine++;
+	  if (line.find(search, 0) != string::npos) 
+	    {
+	      cout<<"Found data for your problem! Lucky you..."<<endl;
+	      preTuned = true;
+	      getline(fileInput, line);
+	      p.N_latt = stof(line);
+	      getline(fileInput, line);
+	      p.C_msqr = stof(line);
+	      cout<<"Using N_latt="<<p.N_latt<<endl;
+	      cout<<"Using C_msqr="<<p.C_msqr<<endl;
+	      fileInput.close();
+	    }
+	}
+      if(!preTuned)
+	cout<<endl<<"AdS wisdom data not found. Strap in for some tuning..."<<endl<<endl;
     }
-    if(!preTuned)
-      cout<<endl<<"AdS wisdom data not found. Strap in for some tuning..."<<endl<<endl;
-  }
   else cout<<endl<<"AdS wisdom file not found. Strap in for some tuning..."<<endl<<endl;
 
   //Begin search for correct scaling factors.
   int iter = 0;
   //while(abs(d_grad) > grad_tol || abs(d_inter) > inter_tol) {
-  while(abs(d_grad) > grad_tol) {
+  while(abs(d_grad) > grad_tol) 
+    {
     
-    Float* phi_ave = new Float[latVol];
-    Float* phi = new Float[latVol];
-    Float* b   = new Float[latVol];
-
-    //Take the average data from sources in the the qth sector
-    //of the outer level.
-    int sources = (endNode(p.Levels,p) - endNode(p.Levels-1,p)) / p.q ;
-
-    //initialise, invert, average.
-    for(int i=0; i<latVol; i++) phi_ave[i] = 0.0;
-    for(int s=0; s<sources; s++) {
-      for(int i=0; i<latVol; i++) {
-	b[i] = 0.0;
-	phi[i] = 0.0;
-      }
-      b[lower + s] = 1.0;
-      Minv_phi(phi, b, NodeList, p);
-      for(int i=0; i<latVol; i++) phi_ave[i] += phi[i]/sources;
-    }
-    
-    //Use current lattice normalisation.
-    for(int i=0; i<latVol; i++) {
-      phi_ave[i] = log(p.N_latt*phi_ave[i]);
-    }
-    
-    //phi_ave now contains an averaged solution vector. We now
-    //perform linear regression on this vector and the analytic
-    //prop (w.r.t the xi invariant) to compute the relevant
-    //scaling and normalsation.
-    
-    double* latt_prop  = new double[outer_cirum];
-
-    //Loop over H2 disk
-    for(long unsigned int k = 0; k < outer_cirum; k++) {
+      Float* phi_ave = new Float[latVol];
+      Float* phi = new Float[latVol];
+      Float* b   = new Float[latVol];
       
-      //Construct i (full lattice AdS2p1 index)
-      int i = lower + k;
-      //Construct s (surface lattice 2D index)
-      int s = k;
-      
-      latt_prop[s] = phi_ave[i];
-    }
-    
-    //Extract linear fit data from log-log plot.
-    gsl_fit_linear(xi_invariant, 1, latt_prop, 1, outer_cirum/2, &c[0], &c[1],
-		   &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
-    
-    cout<<"At iteration "<<iter<<endl;
-    cout<<"GSL data: C="<<c[0]<<" M="<<c[1]<<endl;
-    cout<<"          covar00 = "<<cov_ssq[0]<<endl;
-    cout<<"          covar01 = "<<cov_ssq[1]<<endl;
-    cout<<"          covar11 = "<<cov_ssq[2]<<endl;
-    cout<<"          sum_sq  = "<<cov_ssq[3]<<endl;
-    
-    //Adjust the parameters and start over.
-    d_grad = (c[1] - grad)/abs(grad);
-    cout<<"D grad = "<<d_grad<<endl;
-    cout<<"C_msqr = "<<p.C_msqr<<endl<<endl;
-    
-    double fac1 = abs(p.C_msqr);
-    
-    if( abs(d_grad) > grad_tol ) {
-      if(c[1] > grad) p.msqr < 0 ? p.C_msqr += (fac1*abs(d_grad) + 1*grad_tol) : p.C_msqr -= (fac1*abs(d_grad) + 1*grad_tol);
-      if(c[1] < grad) p.msqr < 0 ? p.C_msqr -= (fac1*abs(d_grad) + 1*grad_tol) : p.C_msqr += (fac1*abs(d_grad) + 1*grad_tol);
-    }
-    
-    if(cov_ssq[0] != cov_ssq[0]) {
-      cout<<"GSL failed!"<<endl;
-      exit(0);
-    }
-    
-    //Did it tune properly?
-    if(d_grad < grad_tol) tuneWin = true;
-    
-    delete[] phi_ave;
-    delete[] phi;
-    delete[] b;
-    delete[] latt_prop;
+      //Take the average data from sources in the the qth sector
+      //of the outer level.
+      //int sources = (endNode(p.Levels,p) - endNode(p.Levels-1,p)) / p.q ;
+      int sources = (endNode(p.Levels,p) - endNode(p.Levels-1,p));
 
-    iter++;
-    
-  }
+      //initialise, invert, average.
+      for(int i=0; i<latVol; i++) 
+	phi_ave[i] = 0.0;
+      for(int s=0; s<sources; s++) 
+	{
+	  for(int i=0; i<latVol; i++) 
+	    {
+	      b[i] = 0.0;
+	      phi[i] = 0.0;
+	    }
+	  b[lower + s] = 1.0;
+	  Minv_phi(phi, b, NodeList, p);
+	  for(int i=0; i<latVol; i++) 
+	    phi_ave[i] += phi[i]/sources;
+	}
+      
+      //Use current lattice normalisation.
+      for(int i=0; i<latVol; i++) 
+	{
+	  phi_ave[i] = log(p.N_latt*phi_ave[i]);
+	}
+      
+      //phi_ave now contains an averaged solution vector. We now
+      //perform linear regression on this vector and the analytic
+      //prop (w.r.t the xi invariant) to compute the relevant
+      //scaling and normalisation.
+      
+      double* latt_prop  = new double[outer_cirum];
+      
+      //Loop over H2 disk
+      for(long unsigned int k = 0; k < outer_cirum; k++) 
+	{
+	  //Construct i (full lattice AdS2p1 index)
+	  int i = lower + k;
+	  //Construct s (surface lattice 2D index)
+	  int s = k;
+	  
+	  latt_prop[s] = phi_ave[i];
+	}
+      
+      //Extract linear fit data from log-log plot.
+      gsl_fit_linear(xi_invariant, 1, latt_prop, 1, outer_cirum /* /2 */, &c[0], &c[1],
+		     &cov_ssq[0], &cov_ssq[1], &cov_ssq[2], &cov_ssq[3]);
+      
+      cout<<"At iteration "<<iter<<endl;
+      cout<<"GSL data: C="<<c[0]<<" M="<<c[1]<<endl;
+      cout<<"          covar00 = "<<cov_ssq[0]<<endl;
+      cout<<"          covar01 = "<<cov_ssq[1]<<endl;
+      cout<<"          covar11 = "<<cov_ssq[2]<<endl;
+      cout<<"          sum_sq  = "<<cov_ssq[3]<<endl;
+      
+      //Adjust the parameters and start over.
+      d_grad = (c[1] - grad)/abs(grad);
+      cout<<"D grad = "<<d_grad<<endl;
+      cout<<"C_msqr = "<<p.C_msqr<<endl<<endl;
+      
+      double fac1 = abs(p.C_msqr);
+      
+      if( abs(d_grad) > grad_tol ) 
+	{
+	  if(c[1] > grad) p.msqr < 0 ? p.C_msqr += (fac1*abs(d_grad) + 1*grad_tol) : p.C_msqr -= (fac1*abs(d_grad) + 1*grad_tol);
+	  if(c[1] < grad) p.msqr < 0 ? p.C_msqr -= (fac1*abs(d_grad) + 1*grad_tol) : p.C_msqr += (fac1*abs(d_grad) + 1*grad_tol);
+	}
+      
+      if(cov_ssq[0] != cov_ssq[0]) 
+	{
+	  cout<<"GSL failed!"<<endl;
+	  exit(0);
+	}
+      
+      //Did it tune properly?
+      if(d_grad < grad_tol) tuneWin = true;
+      
+      delete[] phi_ave;
+      delete[] phi;
+      delete[] b;
+      delete[] latt_prop;
+      
+      iter++;
+      
+    }
   
   //If this is a new problem, and it tuned properly, save the data.
   if(!preTuned && tuneWin) {
