@@ -31,6 +31,7 @@ class Param{
   Float DiskScale = 1.0;
   char fname[256];
 
+  int Lt = 1;
   int S1 = 32;
   int SurfaceVol = 0;
   int AdSVol = 0;

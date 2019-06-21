@@ -3,7 +3,7 @@
 #============================================================
 
 #Your path to Eigen
-EIGEN=/share/pkg/eigen/3.3.4/install/include/eigen3
+EIGEN=/share/pkg.7/eigen/3.3.5/src/eigen-eigen-b3f3d4950030
 
 TARGET	    = spectrum
 C_SOURCES   = ads_graph.cpp 
