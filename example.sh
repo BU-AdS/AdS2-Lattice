@@ -14,17 +14,17 @@ VERBOSITY='q'
 
 Q=7
 MAX_ITER=100000
-TOL=1e-4
+TOL=1e-6
 MSQR=1.0
 LEVELS=$1
 SRC_POS=-1
-g_MSQR=0.5
+g_MSQR=1.0
 g_LATT=1.0
 LAMBDA=0.0
 SCALE=1.0
 N_SHIFT=1
 
-
+make
 
 COMMAND="./spectrum ${BC} ${CENTRE} ${VERBOSITY} \
 	 	    ${MAX_ITER} ${TOL} ${MSQR} ${LAMBDA} \
