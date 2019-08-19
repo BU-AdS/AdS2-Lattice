@@ -27,11 +27,6 @@ int main(int argc, char **argv)
 {
   Param p;    
   if(argc > 1) p.init(argc, argv);   
-
-  p.S1 = endNode(p.Levels,p) + 1 - (endNode(p.Levels-1,p) + 1);
-  p.SurfaceVol = p.S1;
-  p.AdSVol = (endNode(p.Levels,p) + 1);
-  p.latVol = p.AdSVol;
   
   //Print parameters
   p.print();
@@ -47,52 +42,21 @@ int main(int argc, char **argv)
   //p.src_pos = endNode(5,p)+1;
   cout<<"source position is: "<<p.src_pos<<"\n";
 
-
-  //Setting up initial source locations for 4-point contact term; only the third term will vary
-  int* src_array = new int[4];
-  src_array[0] = p.src_pos;
-  src_array[1] = p.src_pos + (bdry_node_num)/4;
-  src_array[2] = p.src_pos + (bdry_node_num)/4 + 1;
-  src_array[3] = p.src_pos + 3*(bdry_node_num)/4;
-
-  int outer_configs = src_array[3]-src_array[1];
- 
-  int src_pos1 = src_array[0];
-  int src_pos2 = src_array[1];
-  int src_pos3 = src_array[2];
-  int src_pos4 = src_array[3];
-
   //Print graph endnode info
   //for(int i=1; i<20; i++) cout<<"Endnode("<<i<<") = "<<endNode(i,p)<<endl;
   int TotNumber = (endNode(p.Levels,p) + 1);
   
   vector<Vertex> NodeList(TotNumber);
-  vector<Vertex> NodeList1(TotNumber);
-  vector<Vertex> NodeList2(TotNumber);
-  vector<Vertex> NodeList3(TotNumber);
-  vector<Vertex> NodeList4(TotNumber);
 
   //Initialise. -1 in NodeList indicates that node is not yet populated.
   for(int n = 0; n <TotNumber;n++)
     for(int mu = 0; mu < p.q; mu++) { 
       NodeList[n].nn[mu] = -1;
-      NodeList1[n].nn[mu] = -1;
-      NodeList2[n].nn[mu] = -1;
-      NodeList3[n].nn[mu] = -1;
-      NodeList4[n].nn[mu] = -1;
     }
 
   //Construct neighbour table and z-coords
   BuildGraph(NodeList, p);           //populates NodeList[].nn[]
   GetComplexPositions(NodeList, p);  //populates NodeList[].z
-  BuildGraph(NodeList1, p);          
-  GetComplexPositions(NodeList1, p);  
-  BuildGraph(NodeList2, p);           
-  GetComplexPositions(NodeList2, p);  
-  BuildGraph(NodeList3, p);           
-  GetComplexPositions(NodeList3, p);  
-  BuildGraph(NodeList4, p);           
-  GetComplexPositions(NodeList4, p); 
   
   //for(int i=endNode(p.Levels-1,p)+1; i<TotNumber; i++)
   //NodeList[i].z = NodeList[i].z/abs(NodeList[i].z);
@@ -116,7 +80,65 @@ int main(int argc, char **argv)
     }
   
   // Lattice Scaling
-  latticeScaling(NodeList, p);   
+  //latticeScaling(NodeList, p);   
+
   
+  //-------------//
+  // CG routines //
+  //-------------//
+
+ 
+  /*
+  Float* phi0 = new Float[TotNumber];   
+  Float* b0 = new Float[TotNumber];
+  for(int i=0; i<TotNumber; i++)
+    {
+      phi0[i] = 0.0;
+      b0[i] = 0.0;
+    }
+
+  b0[p.src_pos] = 1;
+  Float truesq1 = 0.0;
+  truesq1 = Minv_phi(phi0, b0, NodeList, p);
+  Bulk2Bdry(NodeList, phi0, p);
+  */
+  
+  Mphi_ev(NodeList, p);
+
+  /*
+  Float** phi1 = new Float*[TotNumber];
+  Float* b1 = new Float[TotNumber];
+  for(int i=0; i<TotNumber; i++)
+    {
+      b1[i] = 0.0;
+      phi1[i] = new Float[TotNumber];
+      for(int j=0; j<TotNumber; j++)
+	{
+	  phi1[i][j] = 0.0;
+	}
+    }
+
+  for(int i=0; i<TotNumber; i++)
+    {
+      b1[i] = 1.0;
+      Minv_phi(phi1[i], b1, NodeList, p);
+      b1[i] = 0.0;
+    }
+
+  */
+
+
+  ofstream distfile;
+  distfile.open("distance_m"+to_string(p.msqr)+"_L"+to_string(p.Levels)+"_q"+to_string(p.q)+".dat");
+  for(int i=0; i<TotNumber; i++)
+    {
+      for(int j=0; j<TotNumber; j++)
+	{
+	  distfile << d12(NodeList[i].z, NodeList[j].z) << " ";
+	}
+      distfile << "\n";
+    }
+  distfile.close();
+
   return 0;
 }

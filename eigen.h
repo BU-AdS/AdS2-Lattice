@@ -59,6 +59,7 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
   
   // Allocate a sufficiently gigantic matrix.
   dMatrix mat_real = dMatrix::Zero(N, N);
+  dMatrix mat_inv = dMatrix::Zero(N, N);
 
   // Form matrix elements. This is where it's important that
   // dMatrix is column major.
@@ -87,12 +88,15 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
     for (int j = 0; j < N; j++) mptr[j] = out_real[j];
     
   }
+  mat_inv = mat_real.inverse();
 
   // We've now formed the dense matrix. We print it here
   // as a sanity check if it's small enough.
-  if (N <= 16)
+  if (N <= 32)
   {
     std::cout << mat_real << "\n";
+    std::cout << "MATRIX INVERSE" << "\n";
+    std::cout << mat_inv << "\n";
   }
 
   // Get the eigenvalues and eigenvectors.
@@ -107,7 +111,7 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
   
 
   dMatrix evals = eigsolve_real.eigenvalues();
-  
+  /*
   FILE *fp;
   char efname[256];
   sprintf(efname, "EV%d_q%d_Lev%d_msqr%.3e_src%d_%s_%s.dat",
@@ -123,7 +127,25 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
     fprintf(fp, "%d %.16e\n", i, (double)evals(i) );
   }
   fclose(fp);
-  
+  */
+
+  ofstream hamfile;
+  ofstream greenfile;
+  hamfile.open("ham_m"+to_string(p.msqr)+"_L"+to_string(p.Levels)+"_q"+to_string(p.q)+".dat");
+  greenfile.open("green_m"+to_string(p.msqr)+"_L"+to_string(p.Levels)+"_q"+to_string(p.q)+".dat");
+  for(int i=0; i<N; i++)
+    {
+      for(int j=0; j<N; j++)
+	{
+	  hamfile << 1.0*(double)mat_real(i,j) << " ";
+	  greenfile << 1.0*(double)mat_inv(i,j) << " ";
+	}
+      hamfile << "\n";
+      greenfile << "\n";
+    }
+  hamfile.close();
+  greenfile.close();
+
   // Print the eigenvectors if the matrix is small enough.
   // As a remark, this also shows you how to access the eigenvectors. 
   if (N <= 16)
