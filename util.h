@@ -59,6 +59,7 @@ class Param{
   
   void print()
   {
+    cout<<"**********************************************************"<<endl;
     cout<<"Parameter status:"<<endl;
     cout<<"Triangulation = "<<q<<endl;
     cout<<"B.C. = "<< (bc ? ("Dirichlet") : ("Neumann") ) << endl;
@@ -73,6 +74,7 @@ class Param{
     cout<<"Mass squared Correction = "<<C_msqr<<endl;
     cout<<"Lattice normalisation = "<<N_latt<<endl;
     cout<<"DiskScale = "<<DiskScale<<endl;
+    cout<<"**********************************************************"<<endl<<endl;
   }
   
   void init(int argc, char **argv) 

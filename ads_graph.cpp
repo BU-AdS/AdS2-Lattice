@@ -28,9 +28,6 @@ int main(int argc, char **argv)
   Param p;    
   if(argc > 1) p.init(argc, argv);   
   
-  //Print parameters
-  p.print();
-
   //If the specified source position is < 0, place the point source on the outer circumference.
   //if(p.src_pos < 0) p.src_pos = endNode(p.Levels-1,p) + (endNode(p.Levels,p) - endNode(p.Levels-1,p) )/2;  
 
@@ -62,7 +59,7 @@ int main(int argc, char **argv)
   //NodeList[i].z = NodeList[i].z/abs(NodeList[i].z);
 
   //Debug tools
-  // FIXME: temporal stuff removed
+  //FIXME: temporal stuff removed
   //ConnectivityCheck(NodeList, p);
   //CheckEdgeLength(NodeList, p);
   //CheckArea(NodeList, p);  
@@ -81,7 +78,7 @@ int main(int argc, char **argv)
   
   // Lattice Scaling
   //latticeScaling(NodeList, p);   
-
+  
   
   //-------------//
   // CG routines //
@@ -89,45 +86,47 @@ int main(int argc, char **argv)
 
  
   /*
-  Float* phi0 = new Float[TotNumber];   
-  Float* b0 = new Float[TotNumber];
-  for(int i=0; i<TotNumber; i++)
+    Float* phi0 = new Float[TotNumber];   
+    Float* b0 = new Float[TotNumber];
+    for(int i=0; i<TotNumber; i++)
     {
-      phi0[i] = 0.0;
-      b0[i] = 0.0;
+    phi0[i] = 0.0;
+    b0[i] = 0.0;
     }
 
-  b0[p.src_pos] = 1;
-  Float truesq1 = 0.0;
-  truesq1 = Minv_phi(phi0, b0, NodeList, p);
-  Bulk2Bdry(NodeList, phi0, p);
+    b0[p.src_pos] = 1;
+    Float truesq1 = 0.0;
+    truesq1 = Minv_phi(phi0, b0, NodeList, p);
+    Bulk2Bdry(NodeList, phi0, p);
   */
-  
+
+  //Print parameters prior to function call
+  p.print();  
   Mphi_ev(NodeList, p);
-
+  
   /*
-  Float** phi1 = new Float*[TotNumber];
-  Float* b1 = new Float[TotNumber];
-  for(int i=0; i<TotNumber; i++)
+    Float** phi1 = new Float*[TotNumber];
+    Float* b1 = new Float[TotNumber];
+    for(int i=0; i<TotNumber; i++)
     {
-      b1[i] = 0.0;
-      phi1[i] = new Float[TotNumber];
-      for(int j=0; j<TotNumber; j++)
-	{
-	  phi1[i][j] = 0.0;
-	}
+    b1[i] = 0.0;
+    phi1[i] = new Float[TotNumber];
+    for(int j=0; j<TotNumber; j++)
+    {
+    phi1[i][j] = 0.0;
+    }
     }
 
-  for(int i=0; i<TotNumber; i++)
+    for(int i=0; i<TotNumber; i++)
     {
-      b1[i] = 1.0;
-      Minv_phi(phi1[i], b1, NodeList, p);
-      b1[i] = 0.0;
+    b1[i] = 1.0;
+    Minv_phi(phi1[i], b1, NodeList, p);
+    b1[i] = 0.0;
     }
 
   */
 
-
+  
   ofstream distfile;
   distfile.open("distance_m"+to_string(p.msqr)+"_L"+to_string(p.Levels)+"_q"+to_string(p.q)+".dat");
   for(int i=0; i<TotNumber; i++)

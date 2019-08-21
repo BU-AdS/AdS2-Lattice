@@ -12,11 +12,11 @@ CENTRE='v'
 #v=verbose,q=quiet
 VERBOSITY='q'
 
-Q=7
+Q=$3
 MAX_ITER=100000
 TOL=1e-6
-MSQR=$2
-LEVELS=$1
+MSQR=$1
+LEVELS=$2
 SRC_POS=-1
 g_MSQR=1.0
 g_LATT=1.0

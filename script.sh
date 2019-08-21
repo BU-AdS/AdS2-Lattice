@@ -1,22 +1,14 @@
-./example.sh -0.5 4 7
-./example.sh -0.4 4 7
-./example.sh -0.3 4 7
-./example.sh -0.2 4 7
-./example.sh -0.1 4 7
-./example.sh 0.0 4 7
-./example.sh 0.1 4 7
-./example.sh 0.2 4 7
-./example.sh 0.3 4 7
-./example.sh 0.3 4 7
-./example.sh 0.5 4 7
-./deltalin -0.5 4 7
-./deltalin -0.4 4 7
-./deltalin -0.3 4 7
-./deltalin -0.2 4 7
-./deltalin -0.1 4 7
-./deltalin 0.0 4 7
-./deltalin 0.1 4 7
-./deltalin 0.2 4 7
-./deltalin 0.3 4 7
-./deltalin 0.3 4 7
-./deltalin 0.5 4 7
+#!/bin/bash 
+
+for Q in 7 ; do
+    
+    for LEVELS in 4; do
+
+	# seq START STEP END
+	for MASS in `seq -0.5 0.1 0.5`; do
+	    ./example.sh ${MASS} ${LEVELS} ${Q}
+	    ./deltalin ${MASS} ${LEVELS} ${Q}
+	    
+	done #MASS
+    done #LEVELS
+done #Q
