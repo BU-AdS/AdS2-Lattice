@@ -4,7 +4,7 @@
 
 #Your path to Eigen
 #EIGEN=/share/pkg.7/eigen/3.3.5/src/eigen-eigen-b3f3d4950030
-EIGEN=/Users/deanhowarth/Eigen
+EIGEN=/Users/hattrick/Eigen
 
 SPECTRUM_INCLUDES = graph.h util.h cg.h cg_multishift.h eigen.h graph.h
 
@@ -27,7 +27,7 @@ ads_graph.o: ads_graph.cpp Makefile ${SPECTRUM_INCLUDES}
 all: deltalin
 
 deltalin: delta_lin_fit.o
-	$(CXX) $(CXXFLAGS) -o deltalin delta_lin_fit.o
+	$(CXX) $(CXXFLAGS) -o deltalin delta_lin_fit.o $(LIBDIRS)
 
 delta_lin_fit.o: delta_lin_fit.cpp Makefile 
 	$(CXX) $(CXXFLAGS) -c delta_lin_fit.cpp
