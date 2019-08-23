@@ -55,7 +55,7 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
 
   std::cout << "Real, Symmetric case.\n";
   std::cout << "NeV Requested = " << N << "\n";
-  p.print();
+  //p.print();
   
   // Allocate a sufficiently gigantic matrix.
   dMatrix mat_real = dMatrix::Zero(N, N);
@@ -86,7 +86,7 @@ int Mphi_ev(vector<Vertex> NodeList, Param p )
     Float* mptr = &(mat_real(i*N));
     
     for (int j = 0; j < N; j++) mptr[j] = out_real[j];
-    
+    //std::cout << "Column " << i << " of " << N << " entered" << endl;
   }
   mat_inv = mat_real.inverse();
 

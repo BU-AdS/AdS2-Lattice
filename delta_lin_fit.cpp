@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-
+  
   /***** Initialize and read in files *****/
 
   string dir = "/Users/hattrick/Desktop/Dean/adsSpectrum/AdS2-Lattice/";
